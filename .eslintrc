@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "eslint-config-sznm/react",
+    "plugin:react/jsx-runtime",
+    "plugin:@next/next/recommended"
+  ],
+  "rules": {
+    "import/no-extraneous-dependencies": "off",
+    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": "off",
+    "no-console": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "react-hooks/rules-of-hooks": "off",
+    "sonarjs/no-duplicate-string": "off"
+  }
+}
