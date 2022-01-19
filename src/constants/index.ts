@@ -7,10 +7,10 @@ import { getTokenLogoURL } from "../utils";
 import { TokenContract, TokenId, TokenInfo } from "types";
 
 const Addresses = {
-  DAI: "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // mainnet: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
-  CORE: "0x482dC9bB08111CB875109B075A40881E48aE02Cd", // mainnet: "0x62359ed7505efc61ff1d56fef82158ccaffa23d7",
-  CoreDAO: "0x2088149F6696d3B455659cD7036eA5F8209723e5",
-  Lending: "0x59A2532fae82047068004458dc661706Eb8f0b7B",
+  DAI: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+  CORE: "0x62359ed7505efc61ff1d56fef82158ccaffa23d7",
+  CoreDAO: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // TODO: Change Me
+  Lending: "0x54B276C8a484eBF2a244D933AF5FFaf595ea58c5",
 };
 
 export const DaiContract = new Contract(

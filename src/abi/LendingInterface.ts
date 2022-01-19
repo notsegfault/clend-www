@@ -564,6 +564,11 @@ export const LendingInterface = new Interface([
         name: "amountDAIBorrowed",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "pendingInterests",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",
@@ -599,7 +604,7 @@ export const LendingInterface = new Interface([
         type: "address",
       },
     ],
-    name: "editTokenLiquiationBeneficiary",
+    name: "editTokenLiquidationBeneficiary",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -798,7 +803,7 @@ export const LendingInterface = new Interface([
     inputs: [
       {
         internalType: "address",
-        name: "user",
+        name: "",
         type: "address",
       },
     ],
@@ -806,7 +811,7 @@ export const LendingInterface = new Interface([
     outputs: [
       {
         internalType: "uint256",
-        name: "collateral",
+        name: "",
         type: "uint256",
       },
     ],
