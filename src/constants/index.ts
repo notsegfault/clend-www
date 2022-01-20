@@ -9,7 +9,7 @@ import { TokenContract, TokenId, TokenInfo } from "types";
 const Addresses = {
   DAI: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
   CORE: "0x62359ed7505efc61ff1d56fef82158ccaffa23d7",
-  CoreDAO: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // TODO: Change Me
+  CoreDAO: "0xf66Cd2f8755a21d3c8683a10269F795c0532Dd58",
   Lending: "0x54B276C8a484eBF2a244D933AF5FFaf595ea58c5",
 };
 
