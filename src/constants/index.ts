@@ -65,6 +65,7 @@ TokenInfos.set(TokenId.Core, {
   value: TokenId.Core,
   iconUrl: getTokenLogoURL("0x62359Ed7505Efc61FF1D56fEF82158CcaffA23D7"),
   address: Addresses.CORE,
+  isDisabled: false,
 });
 
 TokenInfos.set(TokenId.CoreDAO, {
@@ -73,7 +74,7 @@ TokenInfos.set(TokenId.CoreDAO, {
   value: TokenId.CoreDAO,
   iconUrl: getTokenLogoURL("0x62359Ed7505Efc61FF1D56fEF82158CcaffA23D7"),
   address: Addresses.CoreDAO,
-  isDisabled: true,
+  isDisabled: false,
 });
 
 TokenInfos.set(TokenId.Dai, {
