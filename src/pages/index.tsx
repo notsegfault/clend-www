@@ -2,7 +2,6 @@ import { Stack } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 import { useRef } from "react";
 
-import { Hero } from "../components/home/Hero";
 import { LendingPosition } from "../components/home/LendingPosition";
 // import { LendingStats } from "../components/home/LendingStats";
 import { YourPositions } from "../components/home/YourPositions";
@@ -27,7 +26,6 @@ const Home = () => {
 
   return (
     <Stack spacing="6" width="100%">
-      <Hero mb={{ base: "0", md: "8" }} />
       {/* <LendingStats /> */}
       <LendingPosition scrollRef={lendingDiv} ref={childDiv} />
       {/* <YourStats /> */}
