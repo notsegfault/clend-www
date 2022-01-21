@@ -127,6 +127,7 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
 
   return (
     <Stack
+      mt={{ base: "0", lg: "6" }}
       direction={{ base: "column", lg: "row" }}
       spacing="6"
       alignItems="left"

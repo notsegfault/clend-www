@@ -33,6 +33,11 @@ const Links = [
     label: "Governance",
     items: [
       {
+        label: "(Coming Soon)",
+        href: "#",
+        disabled: true,
+      },
+      /* {
         label: "Snapshot (off-chain voting)",
         href: "#",
         disabled: true,
@@ -45,7 +50,7 @@ const Links = [
       {
         label: "Forum",
         href: "#",
-      },
+      }, */
     ],
   },
 ];
