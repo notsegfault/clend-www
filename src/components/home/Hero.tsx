@@ -15,9 +15,7 @@ export const Hero: FC<BoxProps> = ({ ...props }) => {
       <VStack align="left">
         <HStack mb={{ base: "2", md: "4" }} justifyContent="space-between">
           <Heading fontSize={{ base: "2xl", md: "4xl" }} alignSelf="center">
-            Next Generation
-            <br />
-            Smart Contract Governance
+            CoreDAO Lending Protocol
           </Heading>
           <Img
             display={{ base: "flex", sm: "none" }}
@@ -25,13 +23,7 @@ export const Hero: FC<BoxProps> = ({ ...props }) => {
             src="/header-logo.png"
           />
         </HStack>
-        <Text color="gray.500" fontSize="lg" align="justify">
-          coreDAO is a fully decentralized autonomous organization
-          <br />
-          which is using a combination of governance systems to achieve
-          <br />
-          its on-chain governance and execution.
-        </Text>
+        <Text color="gray.500" fontSize="lg" align="justify" />
       </VStack>
       <Img
         display={{ base: "none", sm: "flex" }}

@@ -1,13 +1,13 @@
 const infuraId = "9aa3d95b3bc440fa88ea12eaa4456161";
-const url = "https://coregov-test.on.fleek.co/";
+const url = "https://coregov.eth.link";
 
 module.exports = {
-  title: "Core Lending Protocol",
-  appName: "Core Lending",
-  description: "Core Lending Protocol",
+  title: "CoreDAO Lending Protocol",
+  appName: "CoreDAO Lending",
+  description: "CoreDAO Lending Protocol",
   url,
   ogImageUrl:
-    "https://gateway.pinata.cloud/ipfs/QmbfST2CWKy5bzGErioUs7r1PjNe7PXYkhsNxHxqrKSgX9",
+    "https://gateway.pinata.cloud/ipfs/QmdAHnK7Mu14ZyiU6At2fm9KtpaQoNs3AwK5G6u32dFj2t",
   twitterHandle: "@CORE_Vault",
   infuraId,
 
