@@ -72,7 +72,7 @@ TokenInfos.set(TokenId.CoreDAO, {
   name: "CoreDAO",
   collateral: true,
   value: TokenId.CoreDAO,
-  iconUrl: getTokenLogoURL("0x62359Ed7505Efc61FF1D56fEF82158CcaffA23D7"),
+  iconUrl: "/coreDAOlogo.png", // Replace with getTokenLogoURL(...) once it's added to trustwallet.
   address: Addresses.CoreDAO,
   isDisabled: false,
 });

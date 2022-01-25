@@ -1,5 +1,5 @@
 const infuraId = "9aa3d95b3bc440fa88ea12eaa4456161";
-const url = "https://coregov.eth.link";
+const url = "https://coregov.eth.limo";
 
 module.exports = {
   title: "CoreDAO Lending Protocol",
@@ -11,7 +11,7 @@ module.exports = {
   twitterHandle: "@CORE_Vault",
   infuraId,
 
-  supportedNetworks: [1, 42],
+  supportedNetworks: [1],
   appName: url,
 
   // Each item is chainId: config
