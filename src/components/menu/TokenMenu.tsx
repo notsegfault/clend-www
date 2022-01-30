@@ -61,14 +61,14 @@ export const TokenMenu: FC<TokenMenuProps> = ({ ...props }) => {
 
   return (
     <Menu {...props} autoSelect={false}>
-      <MenuButton>
-        <HStack width={{ base: "initial", md: "9rem" }}>
+      <MenuButton h={12}>
+        <HStack spacing={[0, 0, 2]} width={{ base: "initial", md: "9rem" }}>
           {!props.showAll && !TokenInfos.get(tokenId)?.collateral ? (
             <TokenMenuItemContent token={TokenInfos.get(TokenId.Core)} />
           ) : (
             <TokenMenuItemContent token={TokenInfos.get(tokenId)} />
           )}
-          <ChevronDownIcon />
+          <ChevronDownIcon boxSize={6} />
         </HStack>
       </MenuButton>
       <MenuList background="#303042" zIndex="999">

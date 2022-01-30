@@ -95,7 +95,7 @@ export const YourPositions: FC<YourPositionProps> = ({
   const tokenInfos = [...TokenInfos.values()];
 
   return (
-    <BlurryBox {...props}>
+    <BlurryBox {...props} zIndex="-1">
       <Heading mb="8" size="lg">
         Your Positions
       </Heading>

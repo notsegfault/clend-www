@@ -87,6 +87,7 @@ export const TokenAmountInput: React.FC<Props> = ({
           isInvalid={parseUnits(sanitize(value), tokenDecimals).gt(
             parseUnits(max, tokenDecimals)
           )}
+          {...(showMaxButton || inputRightElement ? { pr: "4rem" } : {})}
           {...rest}
         />
         {(showMaxButton || inputRightElement) && (
