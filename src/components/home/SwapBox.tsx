@@ -359,7 +359,7 @@ const Borrow = ({ ...props }) => {
       <VStack spacing={{ base: "4", md: "6" }} alignItems="center">
         <VStack width="100%" spacing={{ base: "2", md: "4" }} alignItems="left">
           <Text fontSize="sm">Deposit Collateral</Text>
-          <Flex alignItems="center">
+          <HStack>
             <TokenMenu onChangeCallback={onReset} />
             <TokenAmountInput
               size="lg"
@@ -369,7 +369,7 @@ const Borrow = ({ ...props }) => {
               onUserInput={(input) => setAmount(input)}
               showMaxButton
             />
-          </Flex>
+          </HStack>
           {Number(amount) > Number(formatEther(tokenBalance)) && (
             <Text fontSize={12} color="red.300">
               Insufficient funds
