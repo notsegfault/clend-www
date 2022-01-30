@@ -30,7 +30,7 @@ const RadioCard: FC<UseRadioProps> = ({ children, ...props }) => {
             "linear-gradient(95.32deg, #2F55DE -18.91%, #EA5332 148.09%)",
           color: "white",
           boxShadow,
-          borderRadius: "10px",
+          borderRadius: "7px",
         }}
         px={8}
         py={3}
@@ -58,10 +58,10 @@ export const BorrowRepayButton: FC<UseRadioGroupProps> = ({ ...props }) => {
       <Stack
         direction="row"
         p="2px"
-        borderRadius="10px"
+        borderRadius="9px"
         background="linear-gradient(95.32deg, #2F55DE -18.91%, #EA5332 148.09%)"
       >
-        <HStack borderRadius="10px" bgColor="rgb(41,42,61)" spacing="0" p="2px">
+        <HStack borderRadius="8px" bgColor="rgb(41,42,61)" spacing="0" p="2px">
           {options.map((value) => {
             const radio = getRadioProps({ value });
             return (
