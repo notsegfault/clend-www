@@ -18,6 +18,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `src/pages/index.js`. The page auto-updates as you edit the file.
 
+> Advance time and block for interests testing
+```
+npx hardhat console
+```
+
+once in the hardat console:
+```
+const provider = new ethers.providers.JsonRpcProvider();
+(await provider.send("evm_increaseTime", [60*60*24])) && (await provider.send("evm_mine", []))
+```
+This should advance the timestamp by 1 day and mine a block.
+
 # Static Build
 ```
 yarn static:build

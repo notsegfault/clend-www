@@ -577,6 +577,24 @@ export const LendingInterface = new Interface([
     inputs: [
       {
         internalType: "address",
+        name: "_angel",
+        type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "_isAngel",
+        type: "bool",
+      },
+    ],
+    name: "editAngels",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "token",
         type: "address",
       },
@@ -605,6 +623,13 @@ export const LendingInterface = new Interface([
       },
     ],
     name: "editTokenLiquidationBeneficiary",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "godIsDead",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -640,6 +665,32 @@ export const LendingInterface = new Interface([
     name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "intervenienteHomine",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "isAngel",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -771,25 +822,6 @@ export const LendingInterface = new Interface([
     inputs: [
       {
         internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    name: "tokenRetired",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
         name: "newOwner",
         type: "address",
       },
@@ -803,7 +835,7 @@ export const LendingInterface = new Interface([
     inputs: [
       {
         internalType: "address",
-        name: "",
+        name: "user",
         type: "address",
       },
     ],
@@ -811,7 +843,7 @@ export const LendingInterface = new Interface([
     outputs: [
       {
         internalType: "uint256",
-        name: "",
+        name: "collateral",
         type: "uint256",
       },
     ],
