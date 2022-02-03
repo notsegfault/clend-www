@@ -30,3 +30,12 @@ Once in a while, it's a good idea to verify it's still working properly in offli
 ```
 yarn static:start
 ```
+
+# Fleek Deployment
+Build command:
+
+```yarn install && yarn static:build```
+
+Publish directory:
+
+```out```
