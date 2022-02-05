@@ -4,7 +4,7 @@
   "private": true,
   "author": "notsegfault",
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env HOST=0.0.0.0 next dev",
     "build": "yarn generate:manifest && next build",
     "static:build": "yarn build && next export",
     "static:start": "yarn static:build && cd out && http-server",
