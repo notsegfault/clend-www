@@ -42,6 +42,7 @@ interface Props extends InputProps {
   value: string;
   tokenDecimals: number;
   disabled?: boolean;
+  virtualMax?: string;
   showRadioGroup?: boolean;
   showMaxButton?: boolean;
   inputRightElement?: React.ReactElement;
@@ -57,6 +58,7 @@ export interface InputFieldAmount {
 export const TokenAmountInput: React.FC<Props> = ({
   max = ethers.constants.MaxUint256.toString(),
   value,
+  virtualMax,
   tokenDecimals,
   disabled,
   showMaxButton,
@@ -108,9 +110,16 @@ export const TokenAmountInput: React.FC<Props> = ({
                   disabled={disabled}
                   size="sm"
                   variant="outline"
-                  onClick={() =>
-                    onUserInput(formatEther(max), BigNumber.from(max))
-                  }
+                  onClick={() => {
+                    if (virtualMax) {
+                      onUserInput(
+                        formatEther(virtualMax),
+                        BigNumber.from(virtualMax)
+                      );
+                    } else {
+                      onUserInput(formatEther(max), BigNumber.from(max));
+                    }
+                  }}
                 >
                   Max
                 </Button>

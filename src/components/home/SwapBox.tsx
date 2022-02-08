@@ -343,20 +343,19 @@ const Borrow = ({ ...props }) => {
   const globalLendingStats = useGlobalLendingStats();
   const userLendingInfo = useUserLendingInfo();
 
-  const { /* yearlyPercentInterest, */ collaterabilityOfToken } =
-    globalLendingStats;
-  const {
-    userTotalDebt,
-    userCollateralValue,
-    /* debtorSummary, */ accruedInterest,
-  } = userLendingInfo;
+  const { yearlyPercentInterest, collaterabilityOfToken } = globalLendingStats;
+  const { userTotalDebt, userCollateralValue, debtorSummary, accruedInterest } =
+    userLendingInfo;
 
-  /* const amountDAIBorrowed =
+  const amountDAIBorrowed =
     debtorSummary && debtorSummary.amountDAIBorrowed
       ? debtorSummary.amountDAIBorrowed
-      : BigNumber.from(0); */
+      : BigNumber.from(0);
 
   let daiLeftToBorrow = BigNumber.from(0);
+
+  // max borrowable amount considering 5 mins of interests
+  let safeDaiLeftToBorrow = BigNumber.from(0);
   let daiCanBorrow = BigNumber.from(0);
 
   if (
@@ -373,16 +372,15 @@ const Borrow = ({ ...props }) => {
   }
 
   //  substract 5 minutes of interests
-  // FIXME: Does it make sense to account for accrued interests when borrowing?
-  /* if (yearlyPercentInterest && amountDAIBorrowed.gt(0)) {
+  if (yearlyPercentInterest && amountDAIBorrowed.gt(0)) {
     const accruedInterestInNext5Mins = amountDAIBorrowed
       .mul(yearlyPercentInterest)
       .div(BigNumber.from(100))
       .mul(BigNumber.from(300))
       .div(BigNumber.from(365 * 24 * 60 * 60));
 
-    daiLeftToBorrow = amountDAIBorrowed.sub(accruedInterestInNext5Mins);
-  } */
+    safeDaiLeftToBorrow = daiLeftToBorrow.sub(accruedInterestInNext5Mins);
+  }
 
   if (amount.value) {
     daiCanBorrow = collaterabilityOfToken
@@ -443,6 +441,7 @@ const Borrow = ({ ...props }) => {
             <TokenAmountInput
               size="lg"
               max={daiLeftToBorrow.toString()}
+              virtualMax={safeDaiLeftToBorrow.toString()}
               tokenDecimals={18}
               value={daiAmount.value}
               onUserInput={(input, valueAsBigNumber) =>
