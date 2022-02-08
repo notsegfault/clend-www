@@ -8,7 +8,7 @@ module.exports = withImages({
   trailingSlash: true,
   exportPathMap() {
     return {
-      "/": { page: "/" },
+      "/": { page: "/", query: { a: "" } },
       "/404": { page: "/404" },
     };
   },

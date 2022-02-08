@@ -1,7 +1,9 @@
+/* eslint-disable complexity */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useContractCalls, useEthers, useTokenBalance } from "@usedapp/core";
 import { BigNumber } from "ethers";
-import { FC, ReactNode } from "react";
+import { useRouter } from "next/dist/client/router";
+import { FC, ReactNode, useEffect } from "react";
 
 import { DaiToken, LendingContract } from "../../constants";
 import { LendingInterface } from "abi";
@@ -12,11 +14,19 @@ export const UserLendingInfoProvider: FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { account } = useEthers();
+  const router = useRouter();
+  const { a: queryAccount } = router.query;
 
   const availableDai = useTokenBalance(
     DaiToken.address,
     LendingContract.address
   );
+
+  useEffect(() => {
+    if (account) {
+      router.push(`/?a=${account}`, undefined, { shallow: true });
+    }
+  }, [account]);
 
   const [
     userCollateralValue,
@@ -26,37 +36,37 @@ export const UserLendingInfoProvider: FC<{ children: ReactNode }> = ({
     accruedInterest,
   ] =
     useContractCalls(
-      account
+      account || queryAccount
         ? [
             {
               abi: LendingInterface,
               address: LendingContract.address,
               method: "userCollateralValue",
-              args: [account],
+              args: [account || queryAccount],
             },
             {
               abi: LendingInterface,
               address: LendingContract.address,
               method: "userTotalDebt",
-              args: [account],
+              args: [account || queryAccount],
             },
             {
               abi: LendingInterface,
               address: LendingContract.address,
               method: "debtorSummary",
-              args: [account],
+              args: [account || queryAccount],
             },
             {
               abi: LendingInterface,
               address: LendingContract.address,
               method: "userCollaterals",
-              args: [account],
+              args: [account || queryAccount],
             },
             {
               abi: LendingInterface,
               address: LendingContract.address,
               method: "accruedInterest",
-              args: [account],
+              args: [account || queryAccount],
             },
           ]
         : []
