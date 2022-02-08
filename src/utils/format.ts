@@ -39,7 +39,12 @@ export function formatPercent(percentString: any) {
   return `${fixedPercent}%`;
 }
 
-export const formatNumber = (number: any, usd = false, scale = true) => {
+export const formatNumber = (
+  number: any,
+  usd = false,
+  scale = true,
+  precision = 4
+) => {
   if (Number.isNaN(number) || number === "" || number === undefined) {
     return usd ? "$0.00" : "0";
   }
@@ -75,7 +80,7 @@ export const formatNumber = (number: any, usd = false, scale = true) => {
     return `$${usdString.slice(1, usdString.length)}`;
   }
 
-  return parseFloat(String(num)).toPrecision(4);
+  return parseFloat(String(num)).toPrecision(precision);
 };
 
 export const formatUSD = (number: any) => {

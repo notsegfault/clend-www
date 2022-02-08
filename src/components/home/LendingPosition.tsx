@@ -19,7 +19,7 @@ import {
   useUserLendingInfo,
 } from "../../hooks";
 import { TokenId } from "../../types";
-import { formatPercent, formatUSD } from "../../utils";
+import { formatNumber, formatPercent, formatUSD } from "../../utils";
 import { InfoTooltip } from "../tooltip";
 import { BlurryBox } from "components/container";
 
@@ -156,14 +156,21 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
             value={
               daiLeftToBorrow.isNegative()
                 ? "$0"
-                : formatUSD(formatEther(daiLeftToBorrow))
+                : `≈ ${formatNumber(
+                    formatEther(daiLeftToBorrow),
+                    true,
+                    true,
+                    6
+                  )}`
             }
           />
           <Section
             label="Interest Accrued:"
             tooltip="The accrued interests on your loan"
             value={
-              accruedInterest ? formatUSD(formatEther(accruedInterest)) : "$0"
+              accruedInterest
+                ? `${formatUSD(formatEther(accruedInterest))}`
+                : "$0"
             }
           />
         </VStack>

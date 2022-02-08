@@ -343,9 +343,18 @@ const Borrow = ({ ...props }) => {
   const globalLendingStats = useGlobalLendingStats();
   const userLendingInfo = useUserLendingInfo();
 
-  const { yearlyPercentInterest, collaterabilityOfToken } = globalLendingStats;
-  const { userTotalDebt, userCollateralValue, accruedInterest } =
-    userLendingInfo;
+  const { /* yearlyPercentInterest, */ collaterabilityOfToken } =
+    globalLendingStats;
+  const {
+    userTotalDebt,
+    userCollateralValue,
+    /* debtorSummary, */ accruedInterest,
+  } = userLendingInfo;
+
+  /* const amountDAIBorrowed =
+    debtorSummary && debtorSummary.amountDAIBorrowed
+      ? debtorSummary.amountDAIBorrowed
+      : BigNumber.from(0); */
 
   let daiLeftToBorrow = BigNumber.from(0);
   let daiCanBorrow = BigNumber.from(0);
@@ -356,9 +365,7 @@ const Borrow = ({ ...props }) => {
     userCollateralValue.gt(0) &&
     accruedInterest
   ) {
-    daiLeftToBorrow = userCollateralValue
-      .sub(userTotalDebt)
-      .add(accruedInterest);
+    daiLeftToBorrow = userCollateralValue.sub(userTotalDebt);
   }
 
   if (daiLeftToBorrow.isNegative()) {
@@ -366,15 +373,16 @@ const Borrow = ({ ...props }) => {
   }
 
   //  substract 5 minutes of interests
-  if (yearlyPercentInterest && daiLeftToBorrow.gt(0)) {
-    const accruedInterestInNext5Mins = daiLeftToBorrow
+  // FIXME: Does it make sense to account for accrued interests when borrowing?
+  /* if (yearlyPercentInterest && amountDAIBorrowed.gt(0)) {
+    const accruedInterestInNext5Mins = amountDAIBorrowed
       .mul(yearlyPercentInterest)
       .div(BigNumber.from(100))
       .mul(BigNumber.from(300))
       .div(BigNumber.from(365 * 24 * 60 * 60));
 
-    daiLeftToBorrow = daiLeftToBorrow.sub(accruedInterestInNext5Mins);
-  }
+    daiLeftToBorrow = amountDAIBorrowed.sub(accruedInterestInNext5Mins);
+  } */
 
   if (amount.value) {
     daiCanBorrow = collaterabilityOfToken
@@ -448,7 +456,8 @@ const Borrow = ({ ...props }) => {
               {Number(daiLeftToBorrow.gt(0)) ? (
                 <Text fontSize={12} color="red.300">
                   Maximum borrow amount is{" "}
-                  {formatNumber(formatEther(daiLeftToBorrow))} DAI
+                  {formatNumber(formatEther(daiLeftToBorrow), false, true, 6)}{" "}
+                  DAI
                 </Text>
               ) : (
                 <>
