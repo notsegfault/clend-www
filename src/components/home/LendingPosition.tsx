@@ -53,8 +53,11 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
   const globalLendingStats = useGlobalLendingStats();
   const userLendingInfo = useUserLendingInfo();
 
-  const { yearlyPercentInterest, loanDefaultThresholdPercent } =
-    globalLendingStats;
+  const {
+    yearlyPercentInterest,
+    loanDefaultThresholdPercent,
+    availableDaiToBorrow,
+  } = globalLendingStats;
   const { userCollateralValue, userTotalDebt, accruedInterest, debtorSummary } =
     userLendingInfo;
 
@@ -174,6 +177,15 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
         </VStack>
         <VStack alignItems="left" spacing="4" mt="8">
           <StatHeader>Loan Stats:</StatHeader>
+          <Section
+            label="DAI left to borrow:"
+            tooltip="DAI amount still available to be borrowed"
+            value={
+              availableDaiToBorrow
+                ? formatNumber(formatEther(availableDaiToBorrow))
+                : "0"
+            }
+          />
           <Section
             label="Interest per year:"
             tooltip="Amount of interest you're paying yearly on your borrowed amount"

@@ -2,9 +2,9 @@ import { useContractCalls } from "@usedapp/core";
 import { BigNumber } from "ethers";
 import { FC, ReactNode } from "react";
 
-import { TokenInfos, LendingContract } from "../../constants";
+import { TokenInfos, LendingContract, DaiContract } from "../../constants";
 import { useCollateral } from "../../hooks/useCollateral";
-import { LendingInterface } from "abi";
+import { LendingInterface, ERC20Interface } from "abi";
 
 import { GlobalLendingInfoContext } from "./context";
 
@@ -18,6 +18,7 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
     yearlyPercentInterest,
     loanDefaultThresholdPercent,
     collaterabilityOfToken,
+    availableDaiToBorrow,
   ] =
     useContractCalls([
       {
@@ -38,6 +39,12 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
         method: "collaterabilityOfToken",
         args: [tokenAddress || ""],
       },
+      {
+        abi: ERC20Interface,
+        address: DaiContract.address,
+        method: "balanceOf",
+        args: [LendingContract.address],
+      },
     ]) ?? [];
 
   return (
@@ -47,6 +54,7 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
         loanDefaultThresholdPercent: (loanDefaultThresholdPercent ||
           [])[0] as BigNumber,
         collaterabilityOfToken: (collaterabilityOfToken || [])[0] as BigNumber,
+        availableDaiToBorrow: (availableDaiToBorrow || [])[0] as BigNumber,
       }}
     >
       {children}

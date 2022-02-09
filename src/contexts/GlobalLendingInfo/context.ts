@@ -13,6 +13,7 @@ interface GlobalLendingInfo {
   coreLendingTVL?: BigNumber;
   coreDaoLendingPositions?: BigNumber;
   coreLendingPositions?: BigNumber;
+  availableDaiToBorrow?: BigNumber;
 }
 
 export const GlobalLendingInfoContext = createContext<GlobalLendingInfo>({});
