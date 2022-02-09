@@ -2,7 +2,6 @@
 /* eslint-disable complexity */
 import { Stack, VStack, Text, HStack, TextProps } from "@chakra-ui/react";
 import { formatEther } from "@ethersproject/units";
-import { useEthers } from "@usedapp/core";
 import { BigNumber } from "ethers";
 import {
   FC,
@@ -49,7 +48,6 @@ const Section: FC<{ label: string; value: string; tooltip?: ReactNode }> = ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
   const { scrollRef } = props;
-  const { account } = useEthers();
   const { setCollateralContext } = useCollateral();
   const [actionType, setActionType] = useState<string>("borrow");
   const globalLendingStats = useGlobalLendingStats();
@@ -205,7 +203,7 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
                   </InfoTooltip>
                 </HStack>
               </HStack>
-              {account && (
+              {debtorSummary && (
                 <HStack justifyContent="space-between">
                   <Text color="whiteAlpha.500">
                     Est. Time to <br />
