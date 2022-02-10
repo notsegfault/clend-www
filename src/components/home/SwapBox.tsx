@@ -390,6 +390,7 @@ const Borrow = ({ ...props }) => {
 
   // setDAILeftToBorrow(_daiLeftToBorrow.add(_daiCanBorrow));
   daiLeftToBorrow = daiLeftToBorrow.add(daiCanBorrow);
+  safeDaiLeftToBorrow = safeDaiLeftToBorrow.add(daiCanBorrow);
 
   const { account } = useEthers();
   const tokenBalance =
