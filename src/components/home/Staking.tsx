@@ -116,7 +116,7 @@ const Deposit: FC<DepositProps> = ({ coreDaoWalletAmount, ...props }) => {
           token={CoreDAOToken}
           spenderAddress={CoreVaultContract.address}
         >
-          Stake
+          Deposit
         </TransactionButton>
       </VStack>
     </Box>
@@ -178,7 +178,7 @@ const Withdraw: FC<WithdrawProps> = ({ coreDaoStaked, ...props }) => {
           onClick={onWithdraw}
           spenderAddress={CoreVaultContract.address}
         >
-          Stake
+          Withdraw
         </TransactionButton>
       </VStack>
     </Box>
@@ -261,17 +261,41 @@ export const Staking = () => {
         CoreDAO Staking
       </Heading>
 
-      <VStack align="left" spacing="4">
-        <VStack align="left" fontSize={24}>
-          <StatHeader>APY</StatHeader>
+      <Stack
+        direction={{ base: "column", md: "row" }}
+        alignItems="left"
+        justifyContent="space-between"
+        spacing={{ base: "4", md: "4" }}
+        mt={{ base: "4", md: "8" }}
+      >
+        <VStack align="left" width={{ base: "", md: "48%" }}>
+          <StatHeader fontSize={{ base: 18, md: 24 }}>
+            {" "}
+            Stake CoreDAO - Earn Yield
+          </StatHeader>
+          <Box
+            color="whiteAlpha.500"
+            align="justify"
+            fontSize="sm"
+            mt={{ base: "2", md: "6" }}
+          >
+            Stake your CoreDAO governance token and earn yield on every CORE Fee
+            On Transfer (FoT). The yearly rate of return depends on CORE
+            transaction volume and will vary over time.
+          </Box>
+        </VStack>
+
+        <VStack align="right" fontSize={{ base: 18, md: 24 }}>
+          <StatHeader>Current APY</StatHeader>
           {globalLendingStats.coreDaoApy ? (
-            <>{formatPercent(globalLendingStats.coreDaoApy)}</>
+            <Box align="right">
+              {formatPercent(globalLendingStats.coreDaoApy)}
+            </Box>
           ) : (
             <Spinner />
           )}
         </VStack>
-      </VStack>
-
+      </Stack>
       <Stack
         direction={{ base: "column-reverse", md: "row" }}
         alignItems="left"
@@ -304,7 +328,7 @@ export const Staking = () => {
               <VStack align="left" spacing="4" mr="24">
                 <VStack align="left" spacing="4">
                   <VStack align="left">
-                    <StatHeader>Staked Amount</StatHeader>
+                    <StatHeader>Staked CoreDAO</StatHeader>
                     <>
                       {formatNumber(
                         formatEther(userInfo.amount),
@@ -318,7 +342,7 @@ export const Staking = () => {
 
                 <VStack align="left" spacing="4">
                   <VStack align="left">
-                    <StatHeader>Core In Wallet</StatHeader>
+                    <StatHeader>CORE in Wallet</StatHeader>
                     <>
                       {formatNumber(
                         formatEther(coreWalletAmount),
@@ -334,7 +358,7 @@ export const Staking = () => {
               <VStack align="left" spacing="4">
                 <VStack align="left" spacing="4">
                   <VStack align="left">
-                    <StatHeader>Unstaked Amount</StatHeader>
+                    <StatHeader>Unstaked CoreDAO</StatHeader>
                     <>
                       {formatNumber(
                         formatEther(coreDaoWalletAmount),
@@ -347,7 +371,7 @@ export const Staking = () => {
                 </VStack>
 
                 <VStack align="left" spacing="4">
-                  <StatHeader>Claimable Core</StatHeader>
+                  <StatHeader>Claimable CORE</StatHeader>
 
                   <>
                     {formatNumber(
