@@ -42,11 +42,11 @@ const RadioCard: FC<UseRadioProps> = ({ children, ...props }) => {
 };
 
 export const DepositWithdrawButton: FC<UseRadioGroupProps> = ({ ...props }) => {
-  const options = ["deposit", "withdraw"];
+  const options = ["stake", "withdraw"];
 
   const { getRootProps, getRadioProps } = useRadioGroup({
     name: "action",
-    defaultValue: "deposit",
+    defaultValue: "stake",
     value: props.value,
     onChange: props.onChange,
   });

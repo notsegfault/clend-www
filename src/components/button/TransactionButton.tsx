@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import {
   Button,
   ButtonProps,
@@ -94,7 +95,7 @@ export const TransactionButton: FC<Props> = ({
       {...props}
       onClick={sendTx}
     >
-      {sendingTx ? <Spinner size="md" /> : <>{children}</>}
+      {sendingTx ? <Spinner size={props?.size || "md"} /> : <>{children}</>}
     </Button>
   );
 };

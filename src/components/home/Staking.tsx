@@ -7,30 +7,39 @@ import {
   Heading,
   VStack,
   Spinner,
-  HStack,
   BoxProps,
   Box,
 } from "@chakra-ui/react";
-import { formatEther } from "@ethersproject/units";
-import { useContractCall, useEthers, useTokenBalance } from "@usedapp/core";
+import { formatEther, parseEther } from "@ethersproject/units";
+import {
+  useContractCall,
+  useContractFunction,
+  useEthers,
+  useTokenBalance,
+} from "@usedapp/core";
 import { BigNumber } from "ethers";
 import { useRouter } from "next/dist/client/router";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { CoreVaultInterface } from "../../abi";
-import { CoreDAOContract, CoreVaultContract } from "../../constants";
+import {
+  CoreContract,
+  CoreDAOContract,
+  CoreDAOToken,
+  CoreVaultContract,
+} from "../../constants";
 import { useGlobalLendingStats } from "../../hooks";
 import { formatNumber, formatPercent } from "../../utils";
 import { TransactionButton } from "../button/TransactionButton";
 import { BlurryBox } from "../container";
-// import { TokenAmountInput } from "../input";
+import { InputFieldAmount, TokenAmountInput } from "../input";
 
 import { DepositWithdrawButton } from "./DepositWithdrawButton";
 
 /* eslint-disable complexity */
-const StatHeader: FC<TextProps> = ({ children }) => {
+const StatHeader: FC<TextProps> = ({ children, ...props }) => {
   return (
-    <Text color="whiteAlpha.500" fontWeight="bold">
+    <Text color="whiteAlpha.500" fontWeight="bold" {...props}>
       {children}
     </Text>
   );
@@ -38,21 +47,155 @@ const StatHeader: FC<TextProps> = ({ children }) => {
 
 interface DepositWithdrawProps extends BoxProps {
   type: string;
+  coreDaoWalletAmount: BigNumber;
+  coreDaoStaked: BigNumber;
 }
 
-const Deposit: FC<BoxProps> = ({ ...props }) => {
-  return <Box {...props}>Deposit</Box>;
+interface DepositProps extends BoxProps {
+  coreDaoWalletAmount: BigNumber;
+}
+
+interface WithdrawProps extends BoxProps {
+  coreDaoStaked: BigNumber;
+}
+
+const Deposit: FC<DepositProps> = ({ coreDaoWalletAmount, ...props }) => {
+  const { account } = useEthers();
+  const [depositAmount, setDepositAmount] = useState({
+    value: "",
+    valueAsBigNumber: undefined,
+  } as InputFieldAmount);
+
+  const { state: stakingState, send: stake } = useContractFunction(
+    CoreVaultContract,
+    "deposit",
+    {
+      transactionName: "Stake",
+    }
+  );
+
+  useEffect(() => {
+    if (stakingState.status === "Success") {
+      setDepositAmount({
+        value: "",
+        valueAsBigNumber: undefined,
+      });
+    }
+  }, [stakingState]);
+
+  const onStake = async () => {
+    try {
+      if (depositAmount.valueAsBigNumber) {
+        await stake(3, depositAmount.valueAsBigNumber.toString());
+      } else {
+        await stake(3, parseEther(depositAmount.value.toString()));
+      }
+    } catch (error: any) {
+      if (error?.code !== 4001) {
+        console.error(error);
+      }
+    }
+  };
+
+  return (
+    <Box {...props}>
+      <VStack align="left" spacing="8">
+        <TokenAmountInput
+          size="lg"
+          max={coreDaoWalletAmount.toString()}
+          tokenDecimals={18}
+          value={depositAmount.value}
+          onUserInput={(input, valueAsBigNumber) =>
+            setDepositAmount({ value: input, valueAsBigNumber })
+          }
+          showMaxButton
+        />
+        <TransactionButton
+          disabled={!account}
+          onClick={onStake}
+          token={CoreDAOToken}
+          spenderAddress={CoreVaultContract.address}
+        >
+          Stake
+        </TransactionButton>
+      </VStack>
+    </Box>
+  );
 };
-const Withdraw: FC<BoxProps> = ({ ...props }) => {
-  return <Box {...props}>Withdraw</Box>;
+const Withdraw: FC<WithdrawProps> = ({ coreDaoStaked, ...props }) => {
+  const { account } = useEthers();
+  const [withdrawAmount, setWithdrawAmount] = useState({
+    value: "",
+    valueAsBigNumber: undefined,
+  } as InputFieldAmount);
+
+  const { state: withdrawState, send: withdraw } = useContractFunction(
+    CoreVaultContract,
+    "withdraw",
+    {
+      transactionName: "Unstake",
+    }
+  );
+
+  useEffect(() => {
+    if (withdrawState.status === "Success") {
+      setWithdrawAmount({
+        value: "",
+        valueAsBigNumber: undefined,
+      });
+    }
+  }, [withdrawState]);
+
+  const onWithdraw = async () => {
+    try {
+      if (withdrawAmount.valueAsBigNumber) {
+        await withdraw(3, withdrawAmount.valueAsBigNumber.toString());
+      } else {
+        await withdraw(3, parseEther(withdrawAmount.value.toString()));
+      }
+    } catch (error: any) {
+      if (error?.code !== 4001) {
+        console.error(error);
+      }
+    }
+  };
+
+  return (
+    <Box {...props}>
+      <VStack align="left" spacing="8">
+        <TokenAmountInput
+          size="lg"
+          max={coreDaoStaked.toString()}
+          tokenDecimals={18}
+          value={withdrawAmount.value}
+          onUserInput={(input, valueAsBigNumber) =>
+            setWithdrawAmount({ value: input, valueAsBigNumber })
+          }
+          showMaxButton
+        />
+        <TransactionButton
+          disabled={!account}
+          onClick={onWithdraw}
+          spenderAddress={CoreVaultContract.address}
+        >
+          Stake
+        </TransactionButton>
+      </VStack>
+    </Box>
+  );
 };
 
-const DepositOrWithdraw: FC<DepositWithdrawProps> = ({ type, ...props }) => {
-  if (type === "deposit") {
-    return <Deposit {...props} />;
+const DepositOrWithdraw: FC<DepositWithdrawProps> = ({
+  type,
+  coreDaoWalletAmount,
+  coreDaoStaked,
+  ...props
+}) => {
+  if (type === "stake") {
+    return <Deposit {...props} coreDaoWalletAmount={coreDaoWalletAmount} />;
   }
 
-  return <Withdraw {...props} />;
+  return <Withdraw {...props} coreDaoStaked={coreDaoStaked} />;
 };
 
 export const Staking = () => {
@@ -65,7 +208,13 @@ export const Staking = () => {
     useTokenBalance(
       CoreDAOContract.address,
       account || (queryAccount as string)
-    ) || BigNumber.from(0);
+    ) ?? BigNumber.from(0);
+
+  const coreWalletAmount =
+    useTokenBalance(
+      CoreContract.address,
+      account || (queryAccount as string)
+    ) ?? BigNumber.from(0);
 
   const userInfo =
     useContractCall({
@@ -76,10 +225,31 @@ export const Staking = () => {
     }) ??
     ({
       amount: BigNumber.from(0),
-      rewardDebt: BigNumber.from(0),
     } as any);
 
-  const [actionType, setActionType] = useState<string>("deposit");
+  const pendingCore =
+    useContractCall({
+      abi: CoreVaultInterface,
+      address: CoreVaultContract.address,
+      method: "pendingCore",
+      args: [3, account || queryAccount],
+    })?.[0] ?? BigNumber.from(0);
+
+  const [actionType, setActionType] = useState<string>("stake");
+
+  const { send: deposit } = useContractFunction(CoreVaultContract, "deposit", {
+    transactionName: "Claim",
+  });
+
+  const onClaim = async () => {
+    try {
+      await deposit(3, 0);
+    } catch (error: any) {
+      if (error?.code !== 4001) {
+        console.error(error);
+      }
+    }
+  };
 
   const onActionChanged = (value: string) => {
     setActionType(value);
@@ -103,68 +273,114 @@ export const Staking = () => {
       </VStack>
 
       <Stack
-        direction={{ base: "column", md: "row" }}
-        mt="8"
+        direction={{ base: "column-reverse", md: "row" }}
         alignItems="left"
         justifyContent="space-between"
+        spacing={{ base: "4", md: "0" }}
+        mt={{ base: "4", md: "8" }}
       >
-        <VStack align="left" spacing="4">
-          <VStack align="left">
-            <StatHeader>Staked Amount</StatHeader>
-            <>{formatNumber(formatEther(userInfo.amount), false, false, 3)}</>
+        <BlurryBox variant="inner" mr={{ base: "0", md: "8" }} flexGrow={1}>
+          <DepositWithdrawButton
+            onChange={onActionChanged}
+            value={actionType}
+          />
+          <DepositOrWithdraw
+            mt="8"
+            type={actionType}
+            coreDaoWalletAmount={coreDaoWalletAmount}
+            coreDaoStaked={userInfo?.amount}
+          />
+        </BlurryBox>
+
+        <BlurryBox variant="inner" flexGrow={0}>
+          <VStack alignItems="left" spacing="4" justifyContent="space-between">
+            <StatHeader color="white">Your Staking Summary</StatHeader>
+
+            <Stack
+              direction={{ base: "column", md: "row" }}
+              alignItems="left"
+              spacing="4"
+            >
+              <VStack align="left" spacing="4" mr="24">
+                <VStack align="left" spacing="4">
+                  <VStack align="left">
+                    <StatHeader>Staked Amount</StatHeader>
+                    <>
+                      {formatNumber(
+                        formatEther(userInfo.amount),
+                        false,
+                        false,
+                        3
+                      )}
+                    </>
+                  </VStack>
+                </VStack>
+
+                <VStack align="left" spacing="4">
+                  <VStack align="left">
+                    <StatHeader>Core In Wallet</StatHeader>
+                    <>
+                      {formatNumber(
+                        formatEther(coreWalletAmount),
+                        false,
+                        false,
+                        3
+                      )}
+                    </>
+                  </VStack>
+                </VStack>
+              </VStack>
+
+              <VStack align="left" spacing="4">
+                <VStack align="left" spacing="4">
+                  <VStack align="left">
+                    <StatHeader>Unstaked Amount</StatHeader>
+                    <>
+                      {formatNumber(
+                        formatEther(coreDaoWalletAmount),
+                        false,
+                        false,
+                        3
+                      )}
+                    </>
+                  </VStack>
+                </VStack>
+
+                <VStack align="left" spacing="4">
+                  <StatHeader>Claimable Core</StatHeader>
+
+                  <>
+                    {formatNumber(
+                      formatEther(pendingCore.toString()),
+                      false,
+                      false,
+                      3
+                    )}
+                  </>
+
+                  <TransactionButton
+                    disabled={pendingCore?.lte(0) || !account}
+                    onClick={onClaim}
+                    size="xs"
+                    display={{ base: "none", md: "block" }}
+                  >
+                    claim rewards
+                  </TransactionButton>
+
+                  <TransactionButton
+                    disabled={pendingCore?.lte(0) || !account}
+                    onClick={onClaim}
+                    isFullWidth
+                    display={{ base: "block", md: "none" }}
+                  >
+                    claim rewards
+                  </TransactionButton>
+                </VStack>
+              </VStack>
+            </Stack>
           </VStack>
-        </VStack>
-
-        <VStack align="left" spacing="4">
-          <VStack align="left">
-            <StatHeader>Claimable Core</StatHeader>
-
-            <HStack align="left" spacing="4" justifyContent="space-between">
-              <>
-                {formatNumber(
-                  formatEther(userInfo?.rewardDebt),
-                  false,
-                  false,
-                  3
-                )}
-              </>
-              <TransactionButton
-                disabled={userInfo?.rewardDebt.lte(0)}
-                onClick={() => {}}
-                size="xs"
-              >
-                claim
-              </TransactionButton>
-            </HStack>
-          </VStack>
-        </VStack>
-
-        <VStack align="left" spacing="4">
-          <VStack align="left">
-            <StatHeader>Unstaked Amount</StatHeader>
-            <>
-              {formatNumber(formatEther(coreDaoWalletAmount), false, false, 3)}
-            </>
-          </VStack>
-        </VStack>
-
-        {/* }
-        <TokenAmountInput
-          size="lg"
-          max={daiLeftToBorrow.toString()}
-          virtualMax={safeDaiLeftToBorrow.toString()}
-          tokenDecimals={18}
-          value={daiAmount.value}
-          onUserInput={(input, valueAsBigNumber) =>
-            setDaiAmount({ value: input, valueAsBigNumber })
-          }
-          showMaxButton
-        /> */}
+        </BlurryBox>
       </Stack>
-      <VStack mt="8" align="left" spacing="4">
-        <DepositWithdrawButton onChange={onActionChanged} value={actionType} />
-        <DepositOrWithdraw mt="8" type={actionType} />
-      </VStack>
     </BlurryBox>
   );
 };
