@@ -17,7 +17,7 @@ module.exports = {
   // Each item is chainId: config
   networks: {
     1: {
-      rpcUrl: `https://mainnet.infura.io/v3/${infuraId}`,
+      rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/TsLEJAhX87icgMO7ZVyPcpeEgpFEo96O`,
     },
     1337: {
       rpcUrl: "http://localhost:8545",

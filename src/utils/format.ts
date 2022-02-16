@@ -17,6 +17,7 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
 
 export function formatPercent(percentString: any) {
   const percent = parseFloat(percentString);
+
   if (!percent || percent === Infinity || percent === 0) {
     return "0%";
   }

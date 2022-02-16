@@ -14,6 +14,7 @@ interface GlobalLendingInfo {
   coreDaoLendingPositions?: BigNumber;
   coreLendingPositions?: BigNumber;
   availableDaiToBorrow?: BigNumber;
+  coreDaoApy?: number;
 }
 
 export const GlobalLendingInfoContext = createContext<GlobalLendingInfo>({});

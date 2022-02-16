@@ -4,6 +4,7 @@ import { useRef } from "react";
 
 import { LendingPosition } from "../components/home/LendingPosition";
 // import { LendingStats } from "../components/home/LendingStats";
+import { Staking } from "../components/home/Staking";
 import { YourPositions } from "../components/home/YourPositions";
 // import { YourStats } from "../components/home/YourStats";
 
@@ -29,7 +30,12 @@ const Home = () => {
       {/* <LendingStats /> */}
       <LendingPosition scrollRef={lendingDiv} ref={childDiv} />
       {/* <YourStats /> */}
-      {account && <YourPositions onClickToScroll={onClickToScroll} />}
+      {account && (
+        <>
+          <YourPositions onClickToScroll={onClickToScroll} />
+          <Staking />
+        </>
+      )}
     </Stack>
   );
 };
