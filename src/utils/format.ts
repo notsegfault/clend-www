@@ -81,7 +81,7 @@ export const formatNumber = (
     return `$${usdString.slice(1, usdString.length)}`;
   }
 
-  return parseFloat(String(num)).toPrecision(precision);
+  return parseFloat(String(num)).toFixed(precision);
 };
 
 export const formatUSD = (number: any) => {
