@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { useCoingeckoTokenPrice } from "@usedapp/coingecko";
 import { useContractCalls, useEthers, useTokenBalance } from "@usedapp/core";
 import { BigNumber, ethers } from "ethers";
@@ -21,17 +22,34 @@ const approximatedBlockPerMonth = Math.ceil(
   (approximatedBlockPerDay * 365) / 12
 );
 
+interface FotStats {
+  daily: BigNumber;
+  weekly: BigNumber;
+  monthly: BigNumber;
+}
+
+interface FotStatsAsFloat {
+  daily: number;
+  weekly: number;
+  monthly: number;
+}
+
 const calculateApy = (
-  totalFoTLast30Days: number,
+  fotStats: FotStatsAsFloat,
   totalTokenInVault: number,
   tokenPriceInUsd: number,
   corePriceInUsd: number
 ) => {
-  const coreGeneratedPerYear = totalFoTLast30Days * (365 / 30);
-  const valueGeneratedPerYear = coreGeneratedPerYear * corePriceInUsd;
   const valueOfPoolInToken = totalTokenInVault * tokenPriceInUsd;
 
-  return (valueGeneratedPerYear * 100) / valueOfPoolInToken;
+  return {
+    daily: (fotStats.daily * 365 * corePriceInUsd * 100) / valueOfPoolInToken,
+    weekly:
+      (fotStats.weekly * (365 / 7) * corePriceInUsd * 100) / valueOfPoolInToken,
+    monthly:
+      (fotStats.monthly * (365 / 30) * corePriceInUsd * 100) /
+      valueOfPoolInToken,
+  };
 };
 
 export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
@@ -45,23 +63,26 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
 
   const corePriceInUsd = useCoingeckoTokenPrice(CoreToken.address, "usd");
   const tokenAddress = TokenInfos.get(collateralContext)?.address;
-  const [coreDaoApy, setCoreDaoApy] = useState<number | undefined>(undefined);
+  const [stakingApy, setStakingApy] = useState<Apy>(undefined);
 
   useEffect(() => {
     if (provider) {
       (async () => {
-        if (coreDaoApy || !totalCoreDaoStaked || !corePriceInUsd) return;
+        if (stakingApy || !totalCoreDaoStaked || !corePriceInUsd) return;
 
         const decoder = new ethers.utils.AbiCoder();
         const toBlock = await provider.getBlockNumber();
         const fromBlock = toBlock - approximatedBlockPerMonth;
+
+        const max7DaysBlockNumber = toBlock - approximatedBlockPerDay * 7;
+        const max24HoursBlockNumber = toBlock - approximatedBlockPerDay;
 
         console.log(
           `Fetching Core Transfer Event from block ${fromBlock} to ${toBlock}...`
         );
         const vaultAddressHex =
           "0x000000000000000000000000c5cacb708425961594b63ec171f4df27a9c0d8c9";
-        const totalFoTLast30Days = (
+        const logs = (
           await provider.getLogs({
             address: CoreToken.address, // Core Token
             topics: [
@@ -71,30 +92,51 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
             toBlock,
           })
         )
-          .filter((log) => !log.removed && log.topics[2] === vaultAddressHex)
-          .reduce((totalFoT: BigNumber, log) => {
-            return totalFoT.add(decoder.decode(["uint256"], log.data)[0]);
-          }, BigNumber.from(0));
+          .sort((evOne, evTwo) => evOne.blockNumber - evTwo.blockNumber)
+          .filter((log) => !log.removed && log.topics[2] === vaultAddressHex);
 
-        const totalFoTLast30DaysAsFloat = parseFloat(
-          ethers.utils.formatEther(totalFoTLast30Days)
-        );
+        const defaultFotStats = {
+          daily: BigNumber.from(0),
+          weekly: BigNumber.from(0),
+          monthly: BigNumber.from(0),
+        } as FotStats;
+
+        const fotStats: FotStats = logs.reduce((stats: FotStats, log) => {
+          const fot = decoder.decode(["uint256"], log.data)[0];
+
+          if (log.blockNumber <= max24HoursBlockNumber) {
+            stats.daily = stats.daily.add(fot);
+            stats.weekly = stats.weekly.add(fot);
+          } else if (log.blockNumber <= max7DaysBlockNumber) {
+            stats.weekly = stats.weekly.add(fot);
+          }
+
+          stats.monthly = stats.monthly.add(fot);
+          return stats;
+        }, defaultFotStats);
+
+        const fotStatsAsFloat = {
+          daily: parseFloat(ethers.utils.formatEther(fotStats.daily)),
+          weekly: parseFloat(ethers.utils.formatEther(fotStats.weekly)),
+          monthly: parseFloat(ethers.utils.formatEther(fotStats.monthly)),
+        } as FotStatsAsFloat;
+
         const totalCoreDaoStakedAsFloat = parseFloat(
           ethers.utils.formatEther(totalCoreDaoStaked)
         );
 
         console.log(
-          `Done, total CoreDAO staked: ${totalCoreDaoStakedAsFloat}, total last 30days FoT: ${totalFoTLast30DaysAsFloat}`
+          `Done, total CoreDAO staked: ${totalCoreDaoStakedAsFloat}, FoT Stats: ${fotStatsAsFloat}`
         );
 
         const apy = calculateApy(
-          totalFoTLast30DaysAsFloat,
+          fotStatsAsFloat,
           totalCoreDaoStakedAsFloat,
           1,
           parseFloat(corePriceInUsd)
         );
 
-        setCoreDaoApy(apy);
+        setStakingApy(apy);
       })();
     }
   }, [provider, corePriceInUsd, totalCoreDaoStaked]);
@@ -140,7 +182,7 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
           [])[0] as BigNumber,
         collaterabilityOfToken: (collaterabilityOfToken || [])[0] as BigNumber,
         availableDaiToBorrow: (availableDaiToBorrow || [])[0] as BigNumber,
-        coreDaoApy,
+        stakingApy,
       }}
     >
       {children}

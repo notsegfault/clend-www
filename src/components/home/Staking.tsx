@@ -9,6 +9,7 @@ import {
   Spinner,
   BoxProps,
   Box,
+  HStack,
 } from "@chakra-ui/react";
 import { formatEther, parseEther } from "@ethersproject/units";
 import {
@@ -285,12 +286,35 @@ export const Staking = () => {
           </Box>
         </VStack>
 
-        <VStack align="right" fontSize={{ base: 18, md: 24 }}>
-          <StatHeader>Current APY</StatHeader>
-          {globalLendingStats.coreDaoApy ? (
-            <Box align="right">
-              {formatPercent(globalLendingStats.coreDaoApy)}
-            </Box>
+        <VStack alignItems={{ base: "flex-start", md: "flex-end" }} spacing="2">
+          <StatHeader fontSize={{ base: 18, md: 24 }}>Average APY</StatHeader>
+          {globalLendingStats.stakingApy ? (
+            <>
+              <HStack>
+                <Box fontSize={{ base: 14, md: 16 }}>
+                  {formatPercent(globalLendingStats.stakingApy.daily, 2)}
+                </Box>
+                <Box color="whiteAlpha.500" fontSize={14}>
+                  24h
+                </Box>
+              </HStack>
+              <HStack>
+                <Box fontSize={{ base: 14, md: 16 }}>
+                  {formatPercent(globalLendingStats.stakingApy.weekly, 2)}
+                </Box>
+                <Box color="whiteAlpha.500" fontSize={14}>
+                  &nbsp;7d
+                </Box>
+              </HStack>
+              <HStack>
+                <Box fontSize={{ base: 14, md: 16 }}>
+                  {formatPercent(globalLendingStats.stakingApy.monthly, 2)}
+                </Box>
+                <Box color="whiteAlpha.500" fontSize={14}>
+                  30d
+                </Box>
+              </HStack>
+            </>
           ) : (
             <Spinner />
           )}

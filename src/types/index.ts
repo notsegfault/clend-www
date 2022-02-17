@@ -8,6 +8,12 @@ export enum TokenId {
   CoreDAO,
 }
 
+export interface Apy {
+  daily: number;
+  weekly: number;
+  monthly: number;
+}
+
 export interface TokenInfo {
   name: string;
   iconUrl: string;

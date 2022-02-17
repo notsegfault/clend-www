@@ -2,6 +2,8 @@
 import { BigNumber } from "ethers";
 import { createContext } from "react";
 
+import { Apy } from "../../types";
+
 interface GlobalLendingInfo {
   yearlyPercentInterest?: BigNumber;
   loanDefaultThresholdPercent?: BigNumber;
@@ -14,7 +16,7 @@ interface GlobalLendingInfo {
   coreDaoLendingPositions?: BigNumber;
   coreLendingPositions?: BigNumber;
   availableDaiToBorrow?: BigNumber;
-  coreDaoApy?: number;
+  stakingApy?: Apy;
 }
 
 export const GlobalLendingInfoContext = createContext<GlobalLendingInfo>({});

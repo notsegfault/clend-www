@@ -15,7 +15,7 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
 });
 
-export function formatPercent(percentString: any) {
+export function formatPercent(percentString: any, over100PercentFixed = 0) {
   const percent = parseFloat(percentString);
 
   if (!percent || percent === Infinity || percent === 0) {
@@ -33,7 +33,7 @@ export function formatPercent(percentString: any) {
   }
   if (Number(fixedPercent) > 0) {
     if (Number(fixedPercent) > 100) {
-      return `${percent?.toFixed(0).toLocaleString()}%`;
+      return `${percent?.toFixed(over100PercentFixed).toLocaleString()}%`;
     }
     return `${fixedPercent}%`;
   }
