@@ -593,7 +593,11 @@ const Repay = ({ ...props }) => {
             <TokenAmountInput
               size="lg"
               tokenDecimals={18}
-              max={tokenNeedToRepay.toString()}
+              max={
+                tokenNeedToRepay.lte(daiBalance)
+                  ? tokenNeedToRepay.toString()
+                  : daiBalance.toString()
+              }
               value={amount.value}
               onUserInput={(input, valueAsBigNumber) =>
                 setAmount({ value: input, valueAsBigNumber })
