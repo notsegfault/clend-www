@@ -13,6 +13,7 @@ import {
   CoreVaultContract,
 } from "../../constants";
 import { useCollateral } from "../../hooks/useCollateral";
+import { Apy } from "../../types";
 import { LendingInterface, ERC20Interface } from "abi";
 
 import { GlobalLendingInfoContext } from "./context";
@@ -63,7 +64,7 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
 
   const corePriceInUsd = useCoingeckoTokenPrice(CoreToken.address, "usd");
   const tokenAddress = TokenInfos.get(collateralContext)?.address;
-  const [stakingApy, setStakingApy] = useState<Apy>(undefined);
+  const [stakingApy, setStakingApy] = useState<Apy | undefined>(undefined);
 
   useEffect(() => {
     if (provider) {
