@@ -289,8 +289,11 @@ export const Staking = () => {
         <VStack alignItems={{ base: "flex-start", md: "flex-end" }} spacing="2">
           <StatHeader fontSize={{ base: 18, md: 24 }}>Average APY</StatHeader>
           {globalLendingStats.stakingApy ? (
-            <>
-              <HStack>
+            <HStack
+              alignItems={{ base: "flex-start", md: "flex-end" }}
+              spacing="2"
+            >
+              <HStack pr="2" borderRight="1px" borderColor="whiteAlpha.500">
                 <Box fontSize={{ base: 14, md: 16 }}>
                   {formatPercent(globalLendingStats.stakingApy.daily, 2)}
                 </Box>
@@ -298,12 +301,12 @@ export const Staking = () => {
                   24h
                 </Box>
               </HStack>
-              <HStack>
+              <HStack pr="2" borderRight="1px" borderColor="whiteAlpha.500">
                 <Box fontSize={{ base: 14, md: 16 }}>
                   {formatPercent(globalLendingStats.stakingApy.weekly, 2)}
                 </Box>
                 <Box color="whiteAlpha.500" fontSize={14}>
-                  &nbsp;7d
+                  7d
                 </Box>
               </HStack>
               <HStack>
@@ -314,7 +317,7 @@ export const Staking = () => {
                   30d
                 </Box>
               </HStack>
-            </>
+            </HStack>
           ) : (
             <Spinner />
           )}
