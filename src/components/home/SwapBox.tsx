@@ -594,9 +594,9 @@ const Repay = ({ ...props }) => {
               size="lg"
               tokenDecimals={18}
               max={
-                tokenNeedToRepay.lte(daiBalance)
+                tokenNeedToRepay.lte(tokenBalance)
                   ? tokenNeedToRepay.toString()
-                  : daiBalance.toString()
+                  : tokenBalance.toString()
               }
               value={amount.value}
               onUserInput={(input, valueAsBigNumber) =>
