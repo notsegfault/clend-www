@@ -629,7 +629,7 @@ const Repay = ({ ...props }) => {
             amount.value !== "" &&
             parseEther(amount.value.toString()).lt(accruedInterestsInToken) && (
               <Text fontSize={12} color="red.300">
-                The amount must cover the accrued interests
+                The amount must cover the accrued interest
               </Text>
             )
           )}
