@@ -254,9 +254,10 @@ const BorrowButton = (props: {
 const RepayButton = (props: {
   amount: { value: number; valueAsBigNumber?: BigNumber };
   tokenBalance: number;
+  accruedInterestsInToken: BigNumber;
   onReset: () => void;
 }) => {
-  const { amount, tokenBalance, onReset } = props;
+  const { amount, tokenBalance, accruedInterestsInToken, onReset } = props;
   const { collateralContext } = useCollateral();
 
   const collateralToken = TokenInfos.get(collateralContext);
@@ -307,7 +308,9 @@ const RepayButton = (props: {
 
   return (
     <>
-      {amount.value === 0 || amount.value > tokenBalance ? (
+      {amount.value === 0 ||
+      amount.value > tokenBalance ||
+      parseEther(amount.value.toString()).lt(accruedInterestsInToken) ? (
         <TransactionButton disabled boxShadow={boxShadow} alignSelf="center">
           Enter Amount
         </TransactionButton>
@@ -548,6 +551,13 @@ const Repay = ({ ...props }) => {
       ? totalDebt.div(collaterabilityOfToken)
       : BigNumber.from(0);
 
+  const accruedInterestsInToken =
+    collaterabilityOfToken &&
+    collaterabilityOfToken.gt(BigNumber.from(0)) &&
+    fullAccruedInterest.gt(BigNumber.from(0))
+      ? fullAccruedInterest.div(collaterabilityOfToken)
+      : BigNumber.from(0);
+
   const { state: reclaimAllCollateralState, send: reclaimAllCollateral } =
     useContractFunction(LendingContract, "reclaimAllCollateral", {
       transactionName: "ReclaimAllCollateral",
@@ -611,10 +621,17 @@ const Repay = ({ ...props }) => {
               }
             />
           </HStack>
-          {Number(amount.value) > Number(formatEther(tokenBalance)) && (
+          {Number(amount.value) > Number(formatEther(tokenBalance)) ? (
             <Text fontSize={12} color="red.300">
               Insufficient funds
             </Text>
+          ) : (
+            amount.value !== "" &&
+            parseEther(amount.value.toString()).lt(accruedInterestsInToken) && (
+              <Text fontSize={12} color="red.300">
+                The amount must cover the accrued interests
+              </Text>
+            )
           )}
         </VStack>
         {!account ? (
@@ -638,6 +655,7 @@ const Repay = ({ ...props }) => {
                   value: Number(amount.value),
                   valueAsBigNumber: amount.valueAsBigNumber,
                 }}
+                accruedInterestsInToken={accruedInterestsInToken}
                 tokenBalance={Number(
                   formatEther(
                     collateralTokenValue === TokenId.Dai
