@@ -75,8 +75,8 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
         const toBlock = await provider.getBlockNumber();
         const fromBlock = toBlock - approximatedBlockPerMonth;
 
-        const max7DaysBlockNumber = toBlock - approximatedBlockPerDay * 7;
-        const max24HoursBlockNumber = toBlock - approximatedBlockPerDay;
+        const min7DaysBlockNumber = toBlock - approximatedBlockPerDay * 7;
+        const min24HoursBlockNumber = toBlock - approximatedBlockPerDay;
 
         console.log(
           `Fetching Core Transfer Event from block ${fromBlock} to ${toBlock}...`
@@ -105,10 +105,11 @@ export const GlobalLendingInfoProvider: FC<{ children: ReactNode }> = ({
         const fotStats: FotStats = logs.reduce((stats: FotStats, log) => {
           const fot = decoder.decode(["uint256"], log.data)[0];
 
-          if (log.blockNumber <= max24HoursBlockNumber) {
+          if (log.blockNumber >= min24HoursBlockNumber) {
             stats.daily = stats.daily.add(fot);
-            stats.weekly = stats.weekly.add(fot);
-          } else if (log.blockNumber <= max7DaysBlockNumber) {
+          }
+
+          if (log.blockNumber >= min7DaysBlockNumber) {
             stats.weekly = stats.weekly.add(fot);
           }
 
