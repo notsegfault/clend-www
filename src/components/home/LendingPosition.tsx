@@ -148,7 +148,11 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
           <Section
             label="DAI Borrowed:"
             tooltip="The current borrowed amount"
-            value={formatUSD(userTotalDebtNumber)}
+            value={
+              debtorSummary?.amountDAIBorrowed
+                ? formatUSD(formatEther(debtorSummary?.amountDAIBorrowed))
+                : "$0"
+            }
           />
           <Section
             label="Left to Borrow:"

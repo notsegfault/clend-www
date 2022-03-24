@@ -315,9 +315,7 @@ const Borrow = ({ ...props }) => {
     userCollateralValue.gt(0) &&
     accruedInterest
   ) {
-    daiLeftToBorrow = userCollateralValue
-      .sub(userTotalDebt)
-      .add(accruedInterest);
+    daiLeftToBorrow = userCollateralValue.sub(userTotalDebt);
   }
 
   if (daiLeftToBorrow.isNegative()) {
