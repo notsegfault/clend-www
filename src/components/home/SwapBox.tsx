@@ -395,6 +395,10 @@ const Borrow = ({ ...props }) => {
   daiLeftToBorrow = daiLeftToBorrow.add(daiCanBorrow);
   safeDaiLeftToBorrow = safeDaiLeftToBorrow.add(daiCanBorrow);
 
+  if (safeDaiLeftToBorrow.lt(0)) {
+    safeDaiLeftToBorrow = BigNumber.from(0);
+  }
+
   const { account } = useEthers();
   const tokenBalance =
     useTokenBalance(TokenInfos.get(collateralContext)?.address, account) ||
