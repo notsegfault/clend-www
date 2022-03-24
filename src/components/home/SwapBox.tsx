@@ -459,7 +459,12 @@ const Borrow = ({ ...props }) => {
               {Number(daiLeftToBorrow.gt(0)) ? (
                 <Text fontSize={12} color="red.300">
                   Maximum borrow amount is{" "}
-                  {formatNumber(formatEther(daiLeftToBorrow), false, true, 6)}{" "}
+                  {formatNumber(
+                    formatEther(safeDaiLeftToBorrow),
+                    false,
+                    true,
+                    6
+                  )}{" "}
                   DAI
                 </Text>
               ) : (

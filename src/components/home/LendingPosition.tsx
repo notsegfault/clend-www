@@ -61,14 +61,24 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
   const { userCollateralValue, userTotalDebt, accruedInterest, debtorSummary } =
     userLendingInfo;
 
-  const daiLeftToBorrow =
+  let daiLeftToBorrow =
     userCollateralValue && userTotalDebt
       ? userCollateralValue.sub(userTotalDebt)
       : BigNumber.from(0);
 
   const amountDAIBorrowed = debtorSummary
-    ? Number(formatEther(debtorSummary.amountDAIBorrowed))
-    : 0;
+    ? debtorSummary.amountDAIBorrowed
+    : BigNumber.from(0);
+
+  if (yearlyPercentInterest && amountDAIBorrowed.gt(0)) {
+    const accruedInterestInNext5Mins = amountDAIBorrowed
+      .mul(yearlyPercentInterest)
+      .div(BigNumber.from(100))
+      .mul(BigNumber.from(300))
+      .div(BigNumber.from(365 * 24 * 60 * 60));
+
+    daiLeftToBorrow = daiLeftToBorrow.sub(accruedInterestInNext5Mins);
+  }
 
   const yearlyPercentInterestNumber = yearlyPercentInterest
     ? yearlyPercentInterest.toNumber()
@@ -104,7 +114,8 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
   const liquidationEstTimestamp = amountDAIBorrowed
     ? Math.floor(
         deltaAmountBeforeLiquidation /
-          (amountDAIBorrowed * yearlyPercentInterestNumber) +
+          (Number(formatEther(amountDAIBorrowed)) *
+            yearlyPercentInterestNumber) +
           currentTimestampInSeconds
       )
     : 0;
