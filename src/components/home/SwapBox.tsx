@@ -32,7 +32,7 @@ import {
 import { TokenContract, TokenId } from "../../types";
 import { formatNumber } from "../../utils";
 import { BlurryBox } from "../container";
-import { TokenAmountInput } from "../input";
+import { InputFieldAmount, TokenAmountInput } from "../input";
 import { TokenMenu, TokenMenuItemContent } from "../menu";
 import { TransactionButton } from "components/button/TransactionButton";
 import { UserWallet } from "components/user/UserWallet";
@@ -45,9 +45,9 @@ interface SwapBoxProps extends BoxProps {
 }
 
 const BorrowButton = (props: {
-  amount: number;
+  amount: { value: number; valueAsBigNumber?: BigNumber };
   tokenBalance: number;
-  daiAmount: number;
+  daiAmount: { value: number; valueAsBigNumber?: BigNumber };
   daiLeftToBorrow: BigNumber;
   availableDai: number;
   onReset: () => void;
@@ -104,10 +104,17 @@ const BorrowButton = (props: {
   const onDepositCollateral = async () => {
     try {
       if (collateralTokenAddress) {
-        await addCollateral(
-          collateralTokenAddress,
-          parseEther(amount.toString()).toString()
-        );
+        if (amount.valueAsBigNumber) {
+          await addCollateral(
+            collateralTokenAddress,
+            amount.valueAsBigNumber.toString()
+          );
+        } else {
+          await addCollateral(
+            collateralTokenAddress,
+            parseEther(amount.value.toString()).toString()
+          );
+        }
       }
     } catch (error: any) {
       // we only care if the error is something _other_ than the user rejected the tx
@@ -119,7 +126,11 @@ const BorrowButton = (props: {
 
   const onBorrow = async () => {
     try {
-      await borrow(parseEther(daiAmount.toString()));
+      if (daiAmount.valueAsBigNumber) {
+        await borrow(daiAmount.valueAsBigNumber.toString());
+      } else {
+        await borrow(parseEther(daiAmount.value.toString()));
+      }
     } catch (error: any) {
       // we only care if the error is something _other_ than the user rejected the tx
       if (error?.code !== 4001) {
@@ -131,11 +142,25 @@ const BorrowButton = (props: {
   const onDepositCollateralAndBorrow = async () => {
     try {
       if (collateralTokenAddress) {
-        await addCollateralAndBorrow(
-          collateralTokenAddress,
-          parseEther(amount.toString()).toString(),
-          parseEther(daiAmount.toString()).toString()
-        );
+        if (amount.valueAsBigNumber) {
+          await addCollateralAndBorrow(
+            collateralTokenAddress,
+            amount.valueAsBigNumber.toString(),
+
+            daiAmount.valueAsBigNumber
+              ? daiAmount.valueAsBigNumber.toString()
+              : parseEther(daiAmount.value.toString()).toString()
+          );
+        } else {
+          console.log("here", parseEther(amount.value.toString()).toString());
+          await addCollateralAndBorrow(
+            collateralTokenAddress,
+            parseEther(amount.value.toString()).toString(),
+            daiAmount.valueAsBigNumber
+              ? daiAmount.valueAsBigNumber.toString()
+              : parseEther(daiAmount.value.toString()).toString()
+          );
+        }
       }
     } catch (error: any) {
       // we only care if the error is something _other_ than the user rejected the tx
@@ -147,33 +172,36 @@ const BorrowButton = (props: {
 
   return (
     <>
-      {(amount === 0 && daiAmount === 0) || amount > tokenBalance ? (
+      {(amount.value === 0 && daiAmount.value === 0) ||
+      amount.value > tokenBalance ? (
         <TransactionButton disabled boxShadow={boxShadow} alignSelf="center">
           Enter Amount
         </TransactionButton>
       ) : (
         <>
-          {amount > 0 && amount <= tokenBalance && daiAmount === 0 && (
-            <TransactionButton
-              token={collateralContract}
-              spenderAddress={LendingContract.address}
-              boxShadow={boxShadow}
-              alignSelf="center"
-              onClick={onDepositCollateral}
-            >
-              Deposit Collateral
-            </TransactionButton>
-          )}
-          {amount === 0 &&
-            daiAmount > 0 &&
-            (availableDai > daiAmount ? (
+          {amount.value > 0 &&
+            amount.value <= tokenBalance &&
+            daiAmount.value === 0 && (
+              <TransactionButton
+                token={collateralContract}
+                spenderAddress={LendingContract.address}
+                boxShadow={boxShadow}
+                alignSelf="center"
+                onClick={onDepositCollateral}
+              >
+                Deposit Collateral
+              </TransactionButton>
+            )}
+          {amount.value === 0 &&
+            daiAmount.value > 0 &&
+            (availableDai > daiAmount.value ? (
               <TransactionButton
                 boxShadow={boxShadow}
                 alignSelf="center"
                 onClick={onBorrow}
                 disabled={
-                  daiAmount <= 0 ||
-                  Number(daiAmount) > Number(formatEther(daiLeftToBorrow))
+                  daiAmount.value <= 0 ||
+                  Number(daiAmount.value) > Number(formatEther(daiLeftToBorrow))
                 }
               >
                 Borrow
@@ -188,10 +216,10 @@ const BorrowButton = (props: {
                 Not Enough DAI Left
               </TransactionButton>
             ))}
-          {amount > 0 &&
-            amount <= tokenBalance &&
-            daiAmount > 0 &&
-            (availableDai > daiAmount ? (
+          {amount.value > 0 &&
+            amount.value <= tokenBalance &&
+            daiAmount.value > 0 &&
+            (availableDai > daiAmount.value ? (
               <TransactionButton
                 token={collateralContract}
                 spenderAddress={LendingContract.address}
@@ -199,8 +227,8 @@ const BorrowButton = (props: {
                 alignSelf="center"
                 onClick={onDepositCollateralAndBorrow}
                 disabled={
-                  daiAmount <= 0 ||
-                  Number(daiAmount) > Number(formatEther(daiLeftToBorrow))
+                  daiAmount.value <= 0 ||
+                  Number(daiAmount.value) > Number(formatEther(daiLeftToBorrow))
                 }
               >
                 Deposit Collateral & Borrow
@@ -224,11 +252,12 @@ const BorrowButton = (props: {
 };
 
 const RepayButton = (props: {
-  amount: number;
+  amount: { value: number; valueAsBigNumber?: BigNumber };
   tokenBalance: number;
+  accruedInterestsInToken: BigNumber;
   onReset: () => void;
 }) => {
-  const { amount, tokenBalance, onReset } = props;
+  const { amount, tokenBalance, accruedInterestsInToken, onReset } = props;
   const { collateralContext } = useCollateral();
 
   const collateralToken = TokenInfos.get(collateralContext);
@@ -258,10 +287,17 @@ const RepayButton = (props: {
 
   const onRepayLoan = async () => {
     try {
-      await repayLoanSend(
-        collateralTokenAddress,
-        parseEther(amount.toString()).toString()
-      );
+      if (amount.valueAsBigNumber) {
+        await repayLoanSend(
+          collateralTokenAddress,
+          amount.valueAsBigNumber.toString()
+        );
+      } else {
+        await repayLoanSend(
+          collateralTokenAddress,
+          parseEther(amount.value.toString()).toString()
+        );
+      }
     } catch (error: any) {
       // we only care if the error is something _other_ than the user rejected the tx
       if (error?.code !== 4001) {
@@ -272,13 +308,15 @@ const RepayButton = (props: {
 
   return (
     <>
-      {amount === 0 || amount > tokenBalance ? (
+      {amount.value === 0 ||
+      amount.value > tokenBalance ||
+      parseEther(amount.value.toString()).lt(accruedInterestsInToken) ? (
         <TransactionButton disabled boxShadow={boxShadow} alignSelf="center">
           Enter Amount
         </TransactionButton>
       ) : (
         <>
-          {amount > 0 && amount <= tokenBalance && (
+          {amount.value > 0 && amount.value <= tokenBalance && (
             <TransactionButton
               token={collateralContract}
               spenderAddress={LendingContract.address}
@@ -296,17 +334,31 @@ const RepayButton = (props: {
 };
 
 const Borrow = ({ ...props }) => {
-  const [amount, setAmount] = useState("");
-  const [daiAmount, setDaiAmount] = useState("");
+  const [amount, setAmount] = useState({
+    value: "",
+    valueAsBigNumber: undefined,
+  } as InputFieldAmount);
+  const [daiAmount, setDaiAmount] = useState({
+    value: "",
+    valueAsBigNumber: undefined,
+  } as InputFieldAmount);
   const { collateralContext } = useCollateral();
   const globalLendingStats = useGlobalLendingStats();
   const userLendingInfo = useUserLendingInfo();
 
   const { yearlyPercentInterest, collaterabilityOfToken } = globalLendingStats;
-  const { userTotalDebt, userCollateralValue, accruedInterest } =
+  const { userTotalDebt, userCollateralValue, debtorSummary, accruedInterest } =
     userLendingInfo;
 
+  const amountDAIBorrowed =
+    debtorSummary && debtorSummary.amountDAIBorrowed
+      ? debtorSummary.amountDAIBorrowed
+      : BigNumber.from(0);
+
   let daiLeftToBorrow = BigNumber.from(0);
+
+  // max borrowable amount considering 5 mins of interests
+  let safeDaiLeftToBorrow = BigNumber.from(0);
   let daiCanBorrow = BigNumber.from(0);
 
   if (
@@ -323,24 +375,25 @@ const Borrow = ({ ...props }) => {
   }
 
   //  substract 5 minutes of interests
-  if (yearlyPercentInterest && daiLeftToBorrow.gt(0)) {
-    const accruedInterestInNext5Mins = daiLeftToBorrow
+  if (yearlyPercentInterest && amountDAIBorrowed.gt(0)) {
+    const accruedInterestInNext5Mins = amountDAIBorrowed
       .mul(yearlyPercentInterest)
       .div(BigNumber.from(100))
       .mul(BigNumber.from(300))
       .div(BigNumber.from(365 * 24 * 60 * 60));
 
-    daiLeftToBorrow = daiLeftToBorrow.sub(accruedInterestInNext5Mins);
+    safeDaiLeftToBorrow = daiLeftToBorrow.sub(accruedInterestInNext5Mins);
   }
 
-  if (amount) {
+  if (amount.value) {
     daiCanBorrow = collaterabilityOfToken
-      ? collaterabilityOfToken.mul(BigNumber.from(parseEther(amount)))
+      ? collaterabilityOfToken.mul(BigNumber.from(parseEther(amount.value)))
       : BigNumber.from(0);
   }
 
   // setDAILeftToBorrow(_daiLeftToBorrow.add(_daiCanBorrow));
   daiLeftToBorrow = daiLeftToBorrow.add(daiCanBorrow);
+  safeDaiLeftToBorrow = safeDaiLeftToBorrow.add(daiCanBorrow);
 
   const { account } = useEthers();
   const tokenBalance =
@@ -348,8 +401,14 @@ const Borrow = ({ ...props }) => {
     BigNumber.from(0);
 
   const onReset = () => {
-    setAmount("");
-    setDaiAmount("");
+    setAmount({
+      value: "",
+      valueAsBigNumber: undefined,
+    });
+    setDaiAmount({
+      value: "",
+      valueAsBigNumber: undefined,
+    });
   };
 
   return (
@@ -361,14 +420,16 @@ const Borrow = ({ ...props }) => {
             <TokenMenu onChangeCallback={onReset} />
             <TokenAmountInput
               size="lg"
-              max={formatEther(tokenBalance)}
+              max={tokenBalance.toString()}
               tokenDecimals={18}
-              value={amount}
-              onUserInput={(input) => setAmount(input)}
+              value={amount.value}
+              onUserInput={(input, valueAsBigNumber) =>
+                setAmount({ value: input, valueAsBigNumber })
+              }
               showMaxButton
             />
           </HStack>
-          {Number(amount) > Number(formatEther(tokenBalance)) && (
+          {Number(amount.value) > Number(formatEther(tokenBalance)) && (
             <Text fontSize={12} color="red.300">
               Insufficient funds
             </Text>
@@ -383,23 +444,27 @@ const Borrow = ({ ...props }) => {
             </HStack>
             <TokenAmountInput
               size="lg"
-              max={formatEther(daiLeftToBorrow)}
+              max={daiLeftToBorrow.toString()}
+              virtualMax={safeDaiLeftToBorrow.toString()}
               tokenDecimals={18}
-              value={daiAmount}
-              onUserInput={(input) => setDaiAmount(input)}
+              value={daiAmount.value}
+              onUserInput={(input, valueAsBigNumber) =>
+                setDaiAmount({ value: input, valueAsBigNumber })
+              }
               showMaxButton
             />
           </HStack>
-          {Number(daiAmount) > Number(formatEther(daiLeftToBorrow)) && (
+          {Number(daiAmount.value) > Number(formatEther(daiLeftToBorrow)) && (
             <>
               {Number(daiLeftToBorrow.gt(0)) ? (
                 <Text fontSize={12} color="red.300">
                   Maximum borrow amount is{" "}
-                  {formatNumber(formatEther(daiLeftToBorrow))} DAI
+                  {formatNumber(formatEther(daiLeftToBorrow), false, true, 6)}{" "}
+                  DAI
                 </Text>
               ) : (
                 <>
-                  {Number(amount) === 0 && (
+                  {Number(amount.value) === 0 && (
                     <Text fontSize={12} color="red.300">
                       Please deposit some collateral first.
                     </Text>
@@ -413,9 +478,15 @@ const Borrow = ({ ...props }) => {
           <UserWallet />
         ) : (
           <BorrowButton
-            amount={Number(amount)}
+            amount={{
+              value: Number(amount.value),
+              valueAsBigNumber: amount.valueAsBigNumber,
+            }}
             tokenBalance={Number(formatEther(tokenBalance))}
-            daiAmount={Number(daiAmount)}
+            daiAmount={{
+              value: Number(daiAmount.value),
+              valueAsBigNumber: daiAmount.valueAsBigNumber,
+            }}
             daiLeftToBorrow={daiLeftToBorrow}
             availableDai={Number(formatEther(userLendingInfo.availableDai))}
             onReset={onReset}
@@ -427,7 +498,10 @@ const Borrow = ({ ...props }) => {
 };
 
 const Repay = ({ ...props }) => {
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState({
+    value: "",
+    valueAsBigBumber: undefined,
+  } as InputFieldAmount);
   const { collateralContext } = useCollateral();
 
   const collateralToken = TokenInfos.get(collateralContext);
@@ -477,13 +551,23 @@ const Repay = ({ ...props }) => {
       ? totalDebt.div(collaterabilityOfToken)
       : BigNumber.from(0);
 
+  const accruedInterestsInToken =
+    collaterabilityOfToken &&
+    collaterabilityOfToken.gt(BigNumber.from(0)) &&
+    fullAccruedInterest.gt(BigNumber.from(0))
+      ? fullAccruedInterest.div(collaterabilityOfToken)
+      : BigNumber.from(0);
+
   const { state: reclaimAllCollateralState, send: reclaimAllCollateral } =
     useContractFunction(LendingContract, "reclaimAllCollateral", {
       transactionName: "ReclaimAllCollateral",
     });
 
   const onReset = () => {
-    setAmount("");
+    setAmount({
+      value: "",
+      valueAsBigNumber: undefined,
+    });
   };
 
   useEffect(() => {
@@ -519,9 +603,15 @@ const Repay = ({ ...props }) => {
             <TokenAmountInput
               size="lg"
               tokenDecimals={18}
-              max={formatEther(tokenNeedToRepay)}
-              value={amount}
-              onUserInput={(input) => setAmount(input)}
+              max={
+                tokenNeedToRepay.lte(tokenBalance)
+                  ? tokenNeedToRepay.toString()
+                  : tokenBalance.toString()
+              }
+              value={amount.value}
+              onUserInput={(input, valueAsBigNumber) =>
+                setAmount({ value: input, valueAsBigNumber })
+              }
               showMaxButton
               disabled={
                 userTotalDebt &&
@@ -531,10 +621,17 @@ const Repay = ({ ...props }) => {
               }
             />
           </HStack>
-          {Number(amount) > Number(formatEther(tokenBalance)) && (
+          {Number(amount.value) > Number(formatEther(tokenBalance)) ? (
             <Text fontSize={12} color="red.300">
               Insufficient funds
             </Text>
+          ) : (
+            amount.value !== "" &&
+            parseEther(amount.value.toString()).lt(accruedInterestsInToken) && (
+              <Text fontSize={12} color="red.300">
+                The amount must cover the accrued interest
+              </Text>
+            )
           )}
         </VStack>
         {!account ? (
@@ -554,7 +651,11 @@ const Repay = ({ ...props }) => {
               </TransactionButton>
             ) : (
               <RepayButton
-                amount={Number(amount)}
+                amount={{
+                  value: Number(amount.value),
+                  valueAsBigNumber: amount.valueAsBigNumber,
+                }}
+                accruedInterestsInToken={accruedInterestsInToken}
                 tokenBalance={Number(
                   formatEther(
                     collateralTokenValue === TokenId.Dai

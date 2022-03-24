@@ -2,7 +2,8 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { EmotionCache } from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
-import { DAppProvider } from "@usedapp/core";
+import { ChainId, DAppProvider } from "@usedapp/core";
+import AppConfig from "config/app.config";
 import { DefaultSeo } from "next-seo";
 import { AppProps } from "next/app";
 import Head from "next/head";
@@ -33,7 +34,12 @@ const MyApp = ({
   return (
     <CacheProvider value={emotionCache}>
       <ChakraProvider theme={customTheme}>
-        <DAppProvider config={{}}>
+        <DAppProvider
+          config={{
+            readOnlyChainId: ChainId.Mainnet,
+            readOnlyUrls: { [ChainId.Mainnet]: AppConfig.networks[1].rpcUrl },
+          }}
+        >
           <CollateralProvider>
             <GlobalLendingInfoProvider>
               <UserLendingInfoProvider>

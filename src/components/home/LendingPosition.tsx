@@ -2,7 +2,6 @@
 /* eslint-disable complexity */
 import { Stack, VStack, Text, HStack, TextProps } from "@chakra-ui/react";
 import { formatEther } from "@ethersproject/units";
-import { useEthers } from "@usedapp/core";
 import { BigNumber } from "ethers";
 import {
   FC,
@@ -19,7 +18,7 @@ import {
   useUserLendingInfo,
 } from "../../hooks";
 import { TokenId } from "../../types";
-import { formatPercent, formatUSD } from "../../utils";
+import { formatNumber, formatPercent, formatUSD } from "../../utils";
 import { InfoTooltip } from "../tooltip";
 import { BlurryBox } from "components/container";
 
@@ -49,14 +48,16 @@ const Section: FC<{ label: string; value: string; tooltip?: ReactNode }> = ({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
   const { scrollRef } = props;
-  const { account } = useEthers();
   const { setCollateralContext } = useCollateral();
   const [actionType, setActionType] = useState<string>("borrow");
   const globalLendingStats = useGlobalLendingStats();
   const userLendingInfo = useUserLendingInfo();
 
-  const { yearlyPercentInterest, loanDefaultThresholdPercent } =
-    globalLendingStats;
+  const {
+    yearlyPercentInterest,
+    loanDefaultThresholdPercent,
+    availableDaiToBorrow,
+  } = globalLendingStats;
   const { userCollateralValue, userTotalDebt, accruedInterest, debtorSummary } =
     userLendingInfo;
 
@@ -160,19 +161,35 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
             value={
               daiLeftToBorrow.isNegative()
                 ? "$0"
-                : formatUSD(formatEther(daiLeftToBorrow))
+                : `≈ ${formatNumber(
+                    formatEther(daiLeftToBorrow),
+                    true,
+                    true,
+                    6
+                  )}`
             }
           />
           <Section
             label="Interest Accrued:"
             tooltip="The accrued interests on your loan"
             value={
-              accruedInterest ? formatUSD(formatEther(accruedInterest)) : "$0"
+              accruedInterest
+                ? `${formatUSD(formatEther(accruedInterest))}`
+                : "$0"
             }
           />
         </VStack>
         <VStack alignItems="left" spacing="4" mt="8">
           <StatHeader>Loan Stats:</StatHeader>
+          <Section
+            label="DAI left to borrow:"
+            tooltip="DAI amount still available to be borrowed"
+            value={
+              availableDaiToBorrow
+                ? formatNumber(formatEther(availableDaiToBorrow))
+                : "0"
+            }
+          />
           <Section
             label="Interest per year:"
             tooltip="Amount of interest you're paying yearly on your borrowed amount"
@@ -202,7 +219,7 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
                   </InfoTooltip>
                 </HStack>
               </HStack>
-              {account && (
+              {debtorSummary && (
                 <HStack justifyContent="space-between">
                   <Text color="whiteAlpha.500">
                     Est. Time to <br />

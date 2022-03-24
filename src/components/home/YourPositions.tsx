@@ -155,7 +155,12 @@ export const YourPositions: FC<YourPositionProps> = ({
               <Text>
                 {daiLeftToBorrow.isNegative()
                   ? "$0"
-                  : formatUSD(formatEther(daiLeftToBorrow))}
+                  : `≈ ${formatNumber(
+                      formatEther(daiLeftToBorrow),
+                      true,
+                      true,
+                      6
+                    )}`}
               </Text>
             </VStack>
           </VStack>

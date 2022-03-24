@@ -9,6 +9,8 @@ import {
   Stack,
   Box,
 } from "@chakra-ui/react";
+import { BigNumber } from "@ethersproject/bignumber";
+import { formatEther } from "@ethersproject/units";
 import { ethers } from "ethers";
 import { parseUnits } from "ethers/lib/utils";
 import React from "react";
@@ -21,18 +23,18 @@ function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
-function removeExcessDecimals(string: string, tokenDecimals: number) {
-  if (string.includes(".")) {
-    const splitArray = string.split(".");
+function removeExcessDecimals(input: string, tokenDecimals: number) {
+  if (input.includes(".")) {
+    const splitArray = input.split(".");
     const preDecimal = splitArray[0];
     const postDecimal = splitArray[1];
     const postDecimalLength = postDecimal.length;
     if (postDecimalLength <= tokenDecimals) {
-      return string;
+      return input;
     }
     return `${preDecimal}.${postDecimal.substring(0, tokenDecimals)}`;
   }
-  return string;
+  return input;
 }
 
 interface Props extends InputProps {
@@ -40,16 +42,23 @@ interface Props extends InputProps {
   value: string;
   tokenDecimals: number;
   disabled?: boolean;
+  virtualMax?: string;
   showRadioGroup?: boolean;
   showMaxButton?: boolean;
   inputRightElement?: React.ReactElement;
   inputRef?: React.RefObject<HTMLInputElement>;
-  onUserInput: (value: string) => void;
+  onUserInput: (value: string, valueAsBigNumber?: BigNumber) => void;
+}
+
+export interface InputFieldAmount {
+  value: string;
+  valueAsBigNumber?: BigNumber;
 }
 
 export const TokenAmountInput: React.FC<Props> = ({
   max = ethers.constants.MaxUint256.toString(),
   value,
+  virtualMax,
   tokenDecimals,
   disabled,
   showMaxButton,
@@ -61,7 +70,10 @@ export const TokenAmountInput: React.FC<Props> = ({
 }) => {
   const enforcer = (nextUserInput: string) => {
     if (nextUserInput === "" || inputRegex.test(escapeRegExp(nextUserInput))) {
-      onUserInput(removeExcessDecimals(nextUserInput, tokenDecimals));
+      onUserInput(
+        removeExcessDecimals(nextUserInput, tokenDecimals),
+        undefined
+      );
     }
   };
 
@@ -85,7 +97,7 @@ export const TokenAmountInput: React.FC<Props> = ({
           disabled={disabled}
           spellCheck="false"
           isInvalid={parseUnits(sanitize(value), tokenDecimals).gt(
-            parseUnits(max, tokenDecimals)
+            BigNumber.from(max)
           )}
           {...(showMaxButton || inputRightElement ? { pr: "4rem" } : {})}
           {...rest}
@@ -98,7 +110,16 @@ export const TokenAmountInput: React.FC<Props> = ({
                   disabled={disabled}
                   size="sm"
                   variant="outline"
-                  onClick={() => onUserInput(max)}
+                  onClick={() => {
+                    if (virtualMax) {
+                      onUserInput(
+                        formatEther(virtualMax),
+                        BigNumber.from(virtualMax)
+                      );
+                    } else {
+                      onUserInput(formatEther(max), BigNumber.from(max));
+                    }
+                  }}
                 >
                   Max
                 </Button>

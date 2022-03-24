@@ -4,7 +4,7 @@
   "private": true,
   "author": "notsegfault",
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env HOST=0.0.0.0 next dev",
     "build": "yarn generate:manifest && next build",
     "static:build": "yarn build && next export",
     "static:start": "yarn static:build && cd out && http-server",
@@ -26,6 +26,7 @@
     "@fontsource/inter": "^4.5.0",
     "@react-icons/all-files": "^4.1.0",
     "@types/numeral": "^2.0.1",
+    "@usedapp/coingecko": "^0.4.3",
     "@usedapp/core": "^0.4.7",
     "@web3-react/abstract-connector": "^6.0.7",
     "@web3-react/core": "^6.1.9",

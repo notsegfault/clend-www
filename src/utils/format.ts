@@ -15,8 +15,9 @@ const priceFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
 });
 
-export function formatPercent(percentString: any) {
+export function formatPercent(percentString: any, over100PercentFixed = 0) {
   const percent = parseFloat(percentString);
+
   if (!percent || percent === Infinity || percent === 0) {
     return "0%";
   }
@@ -32,14 +33,19 @@ export function formatPercent(percentString: any) {
   }
   if (Number(fixedPercent) > 0) {
     if (Number(fixedPercent) > 100) {
-      return `${percent?.toFixed(0).toLocaleString()}%`;
+      return `${percent?.toFixed(over100PercentFixed).toLocaleString()}%`;
     }
     return `${fixedPercent}%`;
   }
   return `${fixedPercent}%`;
 }
 
-export const formatNumber = (number: any, usd = false, scale = true) => {
+export const formatNumber = (
+  number: any,
+  usd = false,
+  scale = true,
+  precision = 4
+) => {
   if (Number.isNaN(number) || number === "" || number === undefined) {
     return usd ? "$0.00" : "0";
   }
@@ -75,7 +81,7 @@ export const formatNumber = (number: any, usd = false, scale = true) => {
     return `$${usdString.slice(1, usdString.length)}`;
   }
 
-  return parseFloat(String(num)).toPrecision(4);
+  return parseFloat(String(num)).toFixed(precision);
 };
 
 export const formatUSD = (number: any) => {
