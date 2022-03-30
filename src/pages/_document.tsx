@@ -43,7 +43,13 @@ class MyDocument extends Document {
           <link rel="shortcut icon" href="/icon-180x180.png" />
           <link rel="manifest" href="/manifest.json" />
         </Head>
-        <body>
+        <body
+          style={{
+            backgroundImage: "url('/background.png')",
+            backgroundSize: "cover",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
           <Main />
           <NextScript />
         </body>

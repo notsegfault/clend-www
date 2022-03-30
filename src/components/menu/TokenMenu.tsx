@@ -64,7 +64,7 @@ export const TokenMenu: FC<TokenMenuProps> = ({ ...props }) => {
       <MenuButton h={12}>
         <HStack spacing={[0, 0, 2]} width={{ base: "initial", md: "9rem" }}>
           {!props.showAll && !TokenInfos.get(tokenId)?.collateral ? (
-            <TokenMenuItemContent token={TokenInfos.get(TokenId.Core)} />
+            <TokenMenuItemContent token={TokenInfos.get(TokenId.CoreDAO)} />
           ) : (
             <TokenMenuItemContent token={TokenInfos.get(tokenId)} />
           )}

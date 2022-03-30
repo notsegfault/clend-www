@@ -34,5 +34,5 @@
     "**/Thumbs.db": true,
     "**/node_modules": true
   },
-  "exportall.config.folderListener": ["/src/styles"]
+  "files.eol": "\n"
 }

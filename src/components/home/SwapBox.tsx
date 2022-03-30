@@ -391,7 +391,6 @@ const Borrow = ({ ...props }) => {
       : BigNumber.from(0);
   }
 
-  // setDAILeftToBorrow(_daiLeftToBorrow.add(_daiCanBorrow));
   daiLeftToBorrow = daiLeftToBorrow.add(daiCanBorrow);
   safeDaiLeftToBorrow = safeDaiLeftToBorrow.add(daiCanBorrow);
 

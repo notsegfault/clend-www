@@ -130,7 +130,7 @@ export const LendingPosition = forwardRef((props: { scrollRef: any }, ref) => {
 
   const onActionChanged = (value: string) => {
     setActionType(value);
-    setCollateralContext(TokenId.Core);
+    setCollateralContext(TokenId.Dai);
   };
 
   useImperativeHandle(ref, () => ({

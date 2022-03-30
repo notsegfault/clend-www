@@ -7,7 +7,7 @@ import { CollateralContext } from "./context";
 export const CollateralProvider: FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [collateralContext, setCollateralContext] = useState(TokenId.Core);
+  const [collateralContext, setCollateralContext] = useState(TokenId.CoreDAO);
 
   return (
     <CollateralContext.Provider
