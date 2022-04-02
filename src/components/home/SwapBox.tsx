@@ -30,7 +30,7 @@ import {
   useCollateral,
 } from "../../hooks";
 import { TokenContract, TokenId } from "../../types";
-import { formatNumber } from "../../utils";
+import { formatNumber, tryParseEther } from "../../utils";
 import { BlurryBox } from "../container";
 import { InputFieldAmount, TokenAmountInput } from "../input";
 import { TokenMenu, TokenMenuItemContent } from "../menu";
@@ -152,7 +152,6 @@ const BorrowButton = (props: {
               : parseEther(daiAmount.value.toString()).toString()
           );
         } else {
-          console.log("here", parseEther(amount.value.toString()).toString());
           await addCollateralAndBorrow(
             collateralTokenAddress,
             parseEther(amount.value.toString()).toString(),
@@ -387,7 +386,7 @@ const Borrow = ({ ...props }) => {
 
   if (amount.value) {
     daiCanBorrow = collaterabilityOfToken
-      ? collaterabilityOfToken.mul(BigNumber.from(parseEther(amount.value)))
+      ? collaterabilityOfToken.mul(BigNumber.from(tryParseEther(amount.value)))
       : BigNumber.from(0);
   }
 
@@ -635,7 +634,9 @@ const Repay = ({ ...props }) => {
             </Text>
           ) : (
             amount.value !== "" &&
-            parseEther(amount.value.toString()).lt(accruedInterestsInToken) && (
+            tryParseEther(amount.value.toString()).lt(
+              accruedInterestsInToken
+            ) && (
               <Text fontSize={12} color="red.300">
                 The amount must cover the accrued interest
               </Text>
