@@ -374,7 +374,7 @@ const Borrow = ({ ...props }) => {
   }
 
   //  substract 5 minutes of interests
-  if (yearlyPercentInterest && amountDAIBorrowed.gt(0)) {
+  if (yearlyPercentInterest) {
     const accruedInterestInNext5Mins = amountDAIBorrowed
       .mul(yearlyPercentInterest)
       .div(BigNumber.from(100))
