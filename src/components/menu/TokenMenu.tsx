@@ -11,7 +11,7 @@ import {
   BoxProps,
 } from "@chakra-ui/react";
 import { nanoid } from "nanoid";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { TokenInfos } from "../../constants";
 import { useCollateral } from "../../hooks";
@@ -41,6 +41,7 @@ export const TokenMenuItemContent: FC<{
 interface TokenMenuProps extends BoxProps {
   onChangeCallback?: () => void;
   showAll?: boolean;
+  default?: TokenId;
 }
 
 export const TokenMenu: FC<TokenMenuProps> = ({ ...props }) => {
@@ -58,6 +59,12 @@ export const TokenMenu: FC<TokenMenuProps> = ({ ...props }) => {
   const subTokenList = props.showAll
     ? [...tokenList]
     : tokenList.filter((t) => t.collateral);
+
+  useEffect(() => {
+    if (props.default) {
+      setCollateralContext(props.default);
+    }
+  }, []);
 
   return (
     <Menu {...props} autoSelect={false}>

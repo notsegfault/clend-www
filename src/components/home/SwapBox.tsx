@@ -419,7 +419,7 @@ const Borrow = ({ ...props }) => {
         <VStack width="100%" spacing={{ base: "2", md: "4" }} alignItems="left">
           <Text fontSize="sm">Deposit Collateral</Text>
           <HStack>
-            <TokenMenu onChangeCallback={onReset} />
+            <TokenMenu onChangeCallback={onReset} default={TokenId.CoreDAO} />
             <TokenAmountInput
               size="lg"
               max={tokenBalance.toString()}
