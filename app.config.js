@@ -5,7 +5,7 @@ module.exports = {
   title: "CoreDAO Lending Protocol",
   appName: "CoreDAO Lending",
   description: "CoreDAO Lending Protocol",
-  version: "1.0.1",
+  version: "1.0.2",
   url,
   ogImageUrl:
     "https://gateway.pinata.cloud/ipfs/QmdAHnK7Mu14ZyiU6At2fm9KtpaQoNs3AwK5G6u32dFj2t",
